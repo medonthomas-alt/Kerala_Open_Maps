@@ -13,7 +13,7 @@ A comprehensive collection of open geographic boundary data for Kerala — cover
 | Parliamentary Constituencies | LGD / ECI | 20 |
 | Assembly Constituencies | LGD / ECI | 141 |
 | LSG (Panchayat/Municipality/Corporation) | OpenStreetMap Kerala | 1,035 |
-| Wards | Delimitation Commission Kerala | ~21,000 |
+| Wards | [Vonter/kerala-wards](https://github.com/Vonter/kerala-wards) | ~21,000 |
 | Villages | LGD | 1,623 |
 
 ## Data Sources
