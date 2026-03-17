@@ -386,6 +386,10 @@ body {
       <span class="layer-count">~21,000</span>
       <div class="toggle"></div>
     </div>
+    <div id="ward-note" style="font-size:10px;color:#888;padding:4px 8px 6px 29px;line-height:1.5;display:none;">
+      ⚠️ Ward boundaries (2024) may not align with LSG boundaries (2020) — different sources.<br>
+      <span id="ward-progress" style="color:#0e6655;font-weight:500;"></span>
+    </div>
 
   </div>
 
@@ -400,7 +404,7 @@ body {
 
 <script>
 const CDN = 'https://cdn.jsdelivr.net/gh/medonthomas-alt/Kerala_Open_Maps@main/data';
-const WARD_CDN = CDN + '/local-governance/wards';
+const WARD_CDN = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/local-governance/wards';
 
 const LAYERS = {
   state: {
@@ -528,7 +532,6 @@ function addLayer(id, cfg, data) {
 }
 
 map.on('load', () => {
-  loading(false);
   Object.entries(LAYERS).forEach(([id,cfg]) => {
     loading(true);
     fetch(cfg.url).then(r=>r.json()).then(d=>{ addLayer(id,cfg,d); loading(false); })
@@ -536,18 +539,44 @@ map.on('load', () => {
   });
 });
 
+let wardLoaded = 0;
+let wardTotal = 0;
+
+function updateWardProgress() {
+  const note = document.getElementById('ward-note');
+  const prog = document.getElementById('ward-progress');
+  if (!note || !prog) return;
+  if (wardTotal === 0) { prog.textContent = ''; return; }
+  if (wardLoaded >= wardTotal) {
+    prog.textContent = '✓ All ' + wardTotal + ' districts loaded';
+  } else {
+    prog.textContent = 'Loading… ' + wardLoaded + ' / ' + wardTotal + ' districts';
+  }
+}
+
 function loadVisibleWards() {
   if (!isOn('wards')) return;
   if (map.getZoom() < 9) return;
-  DISTRICTS.forEach(d => {
-    if (loadedWards.has(d)) return;
+
+  // Show note when wards are on
+  const note = document.getElementById('ward-note');
+  if (note) note.style.display = 'block';
+
+  const toLoad = DISTRICTS.filter(d => !loadedWards.has(d));
+  if (!toLoad.length) return;
+
+  wardTotal = DISTRICTS.length;
+  wardLoaded = DISTRICTS.length - toLoad.length;
+  updateWardProgress();
+
+  toLoad.forEach(d => {
     loadedWards.add(d);
     const sid = 'wards-'+d;
     loading(true);
     fetch(WARD_CDN+'/'+d+'_Wards.geojson')
       .then(r=>r.json())
       .then(data => {
-        if (map.getSource(sid)) { loading(false); return; }
+        if (map.getSource(sid)) { loading(false); wardLoaded++; updateWardProgress(); return; }
         map.addSource(sid, { type:'geojson', data });
         const vis = isOn('wards')?'visible':'none';
         const c = '#0e6655';
@@ -572,9 +601,17 @@ function loadVisibleWards() {
         });
         map.on('mouseenter',sid+'-fill',()=>{map.getCanvas().style.cursor='pointer';});
         map.on('mouseleave',sid+'-fill',()=>{map.getCanvas().style.cursor='';});
+        wardLoaded++;
+        updateWardProgress();
         loading(false);
       })
-      .catch(e=>{ console.warn('Ward failed:',d,e); loading(false); loadedWards.delete(d); });
+      .catch(e=>{
+        console.warn('Ward failed:',d,e);
+        loading(false);
+        loadedWards.delete(d);
+        wardLoaded++;
+        updateWardProgress();
+      });
   });
 }
 
@@ -643,6 +680,8 @@ function toggleLayer(el) {
   const id = el.dataset.layer;
   const vis = el.classList.contains('on') ? 'visible' : 'none';
   if (id === 'wards') {
+    const note = document.getElementById('ward-note');
+    if (note) note.style.display = el.classList.contains('on') ? 'block' : 'none';
     window.DISTRICTS.forEach(d => {
       ['fill','line','label'].forEach(t => {
         const lid = 'wards-'+d+'-'+t;
