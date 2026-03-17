@@ -421,17 +421,19 @@ const CDN = 'https://cdn.jsdelivr.net/gh/medonthomas-alt/Kerala_Open_Maps@main/d
 const RAW = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data';
 const WARD_CDN = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/local-governance/wards';
 
+// Global Wikidata QID lookup map
+window.lsgWikidataMap = {};
+
 // Load old LSG data silently for Wikidata QID lookup
-let lsgWikidataMap = {};
 fetch(CDN+'/local-governance/lsg/kerala_lsg_data.geojson')
   .then(r=>r.json())
   .then(data=>{
     data.features.forEach(f=>{
       const name = (f.properties.name||'').toLowerCase();
       const qid = f.properties.wikidata;
-      if (name && qid) lsgWikidataMap[name] = qid;
+      if (name && qid) window.lsgWikidataMap[name] = qid;
     });
-    console.log('Wikidata map loaded:', Object.keys(lsgWikidataMap).length, 'entries');
+    console.log('Wikidata map loaded:', Object.keys(window.lsgWikidataMap).length, 'entries');
   })
   .catch(()=>{});
 
@@ -570,7 +572,7 @@ function addLayer(id, cfg, data) {
     if (['lsg_gp','lsg_muni','lsg_corp'].includes(id)) {
       const lsgName = name;
       const lsgType = cfg.label;
-      const qid = lsgWikidataMap[lsgName.toLowerCase()];
+      const qid = window.lsgWikidataMap[lsgName.toLowerCase()];
 
       popup.setLngLat(e.lngLat).setHTML(`
         <div class="pu-layer">${lsgType}</div>
@@ -717,7 +719,7 @@ function loadVisibleWards() {
           `).addTo(map);
 
           // Look up QID from preloaded map
-          const qid = lsgWikidataMap[lsgName.toLowerCase()];
+          const qid = window.lsgWikidataMap[lsgName.toLowerCase()];
           if (!qid) {
             popup.setHTML(`
               <div class="pu-layer">Ward · ${lsgType}</div>
