@@ -373,10 +373,24 @@ body {
 
     <div class="group-title">Local Governance</div>
 
-    <div class="layer-row" data-layer="lsg" onclick="toggleLayer(this)">
+    <div class="layer-row" data-layer="lsg_corp" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#922b21"></div>
+      <span class="layer-name">Corporations</span>
+      <span class="layer-count">6</span>
+      <div class="toggle"></div>
+    </div>
+
+    <div class="layer-row" data-layer="lsg_muni" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#1a6b3c"></div>
+      <span class="layer-name">Municipalities</span>
+      <span class="layer-count">87</span>
+      <div class="toggle"></div>
+    </div>
+
+    <div class="layer-row" data-layer="lsg_gp" onclick="toggleLayer(this)">
       <div class="layer-swatch" style="background:#6c3483"></div>
-      <span class="layer-name">LSG Bodies</span>
-      <span class="layer-count">1,035</span>
+      <span class="layer-name">Gram Panchayats</span>
+      <span class="layer-count">940</span>
       <div class="toggle"></div>
     </div>
 
@@ -449,11 +463,23 @@ const LAYERS = {
     nf:'ac_name', df:[['dist_name','District'],['pc_name','Parliament']], label:'Assembly Constituency',
     lz:9, ls:11, lb:false
   },
-  lsg: {
-    url: CDN+'/local-governance/lsg/kerala_lsg_data.geojson',
+  lsg_gp: {
+    url: CDN+'/local-governance/lsg-split/Kerala_LSG_GramPanchayat.geojson',
     color:'#6c3483', lw:0.8, fo:0.07,
-    nf:'name', df:[['local_authority:IN','Type']], label:'LSG Body',
+    nf:'LSGD', df:[['District','District']], label:'Gram Panchayat',
     lz:10, ls:10, lb:false
+  },
+  lsg_muni: {
+    url: CDN+'/local-governance/lsg-split/Kerala_LSG_Municipality.geojson',
+    color:'#1a6b3c', lw:1.2, fo:0.08,
+    nf:'LSGD', df:[['District','District']], label:'Municipality',
+    lz:9, ls:11, lb:false
+  },
+  lsg_corp: {
+    url: CDN+'/local-governance/lsg-split/Kerala_LSG_Corporation.geojson',
+    color:'#922b21', lw:2, fo:0.09,
+    nf:'LSGD', df:[['District','District']], label:'Municipal Corporation',
+    lz:8, ls:13, lb:true
   }
 };
 
@@ -522,78 +548,82 @@ function addLayer(id, cfg, data) {
     let det = '';
     cfg.df.forEach(([f,l]) => { if(p[f]) det+=`<div><strong>${l}:</strong> ${cap(p[f])}</div>`; });
 
-    // For LSG layer, enrich with Wikidata
-    if (id === 'lsg' && p.wikidata) {
-      const qid = p.wikidata;
-      const lsgType = cap(p['local_authority:IN'] || '');
+    // For LSG layers, skip click if wards are on and zoomed in
+    if (['lsg_gp','lsg_muni','lsg_corp'].includes(id) && isOn('wards') && map.getZoom() >= 12) return;
 
-      // Show basic popup immediately
+    // For LSG layers, enrich with Wikidata
+    if (['lsg_gp','lsg_muni','lsg_corp'].includes(id)) {
+      const lsgName = name;
+      const lsgType = cfg.label;
+
       popup.setLngLat(e.lngLat).setHTML(`
-        <div class="pu-layer">LSG Body</div>
-        <div class="pu-name">${cap(name)}</div>
+        <div class="pu-layer">${lsgType}</div>
+        <div class="pu-name">${cap(lsgName)}</div>
         <div class="pu-details">
-          ${lsgType ? `<div><strong>Type:</strong> ${lsgType}</div>` : ''}
+          ${det}
           <div style="color:#aaa;font-style:italic;margin-top:4px">Loading details…</div>
         </div>
       `).addTo(map);
 
-      // Fetch Wikidata
-      fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&format=json&props=claims|labels|sitelinks&languages=en|ml&origin=*`)
+      // Search Wikidata by name
+      fetch(`https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(lsgName+' Kerala')}&language=en&format=json&origin=*&limit=1`)
         .then(r => r.json())
         .then(data => {
-          const entity = data.entities[qid];
-          if (!entity) return;
-
-          const claims = entity.claims || {};
-          const labels = entity.labels || {};
-          const sitelinks = entity.sitelinks || {};
-
-          // Malayalam name
-          const mlName = labels.ml ? labels.ml.value : null;
-
-          // Population (P1082)
-          let population = null;
-          if (claims.P1082 && claims.P1082.length) {
-            const popClaim = claims.P1082.sort((a,b) => {
-              const aYear = a.qualifiers?.P585?.[0]?.datavalue?.value?.time || '';
-              const bYear = b.qualifiers?.P585?.[0]?.datavalue?.value?.time || '';
-              return bYear.localeCompare(aYear);
-            })[0];
-            population = popClaim?.mainsnak?.datavalue?.value?.amount;
-            if (population) population = parseInt(population).toLocaleString('en-IN');
-          }
-
-          // Area (P2046)
-          let area = null;
-          if (claims.P2046 && claims.P2046.length) {
-            area = claims.P2046[0]?.mainsnak?.datavalue?.value?.amount;
-            if (area) area = parseFloat(area).toFixed(2) + ' km²';
-          }
-
-          // Wikipedia link
-          const wiki = sitelinks.enwiki ? `https://en.wikipedia.org/wiki/${encodeURIComponent(sitelinks.enwiki.title)}` : null;
-
-          // Build enriched popup
-          let enriched = '';
-          if (lsgType) enriched += `<div><strong>Type:</strong> ${lsgType}</div>`;
-          if (mlName) enriched += `<div><strong>മലയാളം:</strong> ${mlName}</div>`;
-          if (population) enriched += `<div><strong>Population:</strong> ${population}</div>`;
-          if (area) enriched += `<div><strong>Area:</strong> ${area}</div>`;
-          if (wiki) enriched += `<div style="margin-top:6px"><a href="${wiki}" target="_blank" style="color:#c0392b;text-decoration:none;font-size:11px">📖 Wikipedia →</a></div>`;
-          enriched += `<div style="margin-top:4px"><a href="https://www.wikidata.org/wiki/${qid}" target="_blank" style="color:#aaa;text-decoration:none;font-size:10px">${qid}</a></div>`;
-
-          // Update popup if still open
-          if (popup.isOpen()) {
-            popup.setHTML(`
-              <div class="pu-layer">LSG Body</div>
-              <div class="pu-name">${cap(name)}</div>
-              <div class="pu-details">${enriched}</div>
+          const qid = data.search && data.search[0] ? data.search[0].id : null;
+          if (!qid) {
+            if (popup.isOpen()) popup.setHTML(`
+              <div class="pu-layer">${lsgType}</div>
+              <div class="pu-name">${cap(lsgName)}</div>
+              <div class="pu-details">${det}</div>
             `);
+            return;
           }
+          return fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&format=json&props=claims|labels|sitelinks&languages=en|ml&origin=*`)
+            .then(r => r.json())
+            .then(data => {
+              const entity = data.entities[qid];
+              if (!entity) return;
+              const claims = entity.claims || {};
+              const labels = entity.labels || {};
+              const sitelinks = entity.sitelinks || {};
+              const mlName = labels.ml ? labels.ml.value : null;
+
+              let population = null;
+              if (claims.P1082 && claims.P1082.length) {
+                const popClaim = claims.P1082.sort((a,b) => {
+                  const aY = a.qualifiers?.P585?.[0]?.datavalue?.value?.time || '';
+                  const bY = b.qualifiers?.P585?.[0]?.datavalue?.value?.time || '';
+                  return bY.localeCompare(aY);
+                })[0];
+                const raw = popClaim?.mainsnak?.datavalue?.value?.amount;
+                if (raw) population = parseInt(raw).toLocaleString('en-IN');
+              }
+
+              let area = null;
+              if (claims.P2046 && claims.P2046.length) {
+                const raw = claims.P2046[0]?.mainsnak?.datavalue?.value?.amount;
+                if (raw) area = parseFloat(raw).toFixed(2) + ' km²';
+              }
+
+              const wiki = sitelinks.enwiki
+                ? `https://en.wikipedia.org/wiki/${encodeURIComponent(sitelinks.enwiki.title)}`
+                : null;
+
+              if (popup.isOpen()) {
+                let enriched = det;
+                if (mlName) enriched += `<div><strong>മലയാളം:</strong> ${mlName}</div>`;
+                if (population) enriched += `<div><strong>Population:</strong> ${population}</div>`;
+                if (area) enriched += `<div><strong>Area:</strong> ${area}</div>`;
+                if (wiki) enriched += `<div style="margin-top:5px"><a href="${wiki}" target="_blank" style="color:#c0392b;text-decoration:none;font-size:11px">📖 Wikipedia →</a></div>`;
+                popup.setHTML(`
+                  <div class="pu-layer">${lsgType}</div>
+                  <div class="pu-name">${cap(lsgName)}</div>
+                  <div class="pu-details">${enriched}</div>
+                `);
+              }
+            });
         })
-        .catch(() => {
-          // If Wikidata fails, just leave basic popup
-        });
+        .catch(() => {});
       return;
     }
 
@@ -663,17 +693,136 @@ function loadVisibleWards() {
           paint:{'text-color':c,'text-halo-color':'rgba(255,255,255,0.97)','text-halo-width':2}
         });
         map.on('click',sid+'-fill',e=>{
-          const p=e.features[0].properties;
+          const p = e.features[0].properties;
+          const wardName = p.Ward_Name || 'Unknown';
+          const lsgName = p.LSGD || '';
+          const lsgType = cap(p.Lsgd_Type || '');
+          const district = p.District || '';
+          const wardNo = p.Ward_No || '';
+
+          // Show immediate popup
           popup.setLngLat(e.lngLat).setHTML(`
-            <div class="pu-layer">Ward</div>
-            <div class="pu-name">${p.Ward_Name||'Unknown'}</div>
+            <div class="pu-layer">Ward · ${lsgType}</div>
+            <div class="pu-name">${wardName}</div>
             <div class="pu-details">
-              <div><strong>LSG Body:</strong> ${p.LSGD||''}</div>
-              <div><strong>Type:</strong> ${p.Lsgd_Type||''}</div>
-              <div><strong>District:</strong> ${p.District||''}</div>
-              <div><strong>Ward No:</strong> ${p.Ward_No||''}</div>
+              <div><strong>Ward No:</strong> ${wardNo}</div>
+              <div><strong>LSG Body:</strong> ${lsgName}</div>
+              <div><strong>District:</strong> ${district}</div>
+              <div style="color:#aaa;font-style:italic;margin-top:4px">Loading panchayat details…</div>
             </div>
           `).addTo(map);
+
+          // Find matching LSG from gram panchayat source
+          const lsgSrc = map.getSource('lsg_gp') || map.getSource('lsg_muni') || map.getSource('lsg_corp');
+          if (!lsgSrc || !lsgSrc._data) {
+            popup.setHTML(`
+              <div class="pu-layer">Ward · ${lsgType}</div>
+              <div class="pu-name">${wardName}</div>
+              <div class="pu-details">
+                <div><strong>Ward No:</strong> ${wardNo}</div>
+                <div><strong>LSG Body:</strong> ${lsgName}</div>
+                <div><strong>District:</strong> ${district}</div>
+              </div>
+            `);
+            return;
+          }
+
+          // Search all LSG sources for matching name
+          let match = null;
+          for (const srcId of ['lsg_gp', 'lsg_muni', 'lsg_corp']) {
+            const src = map.getSource(srcId);
+            if (!src || !src._data) continue;
+            const found = src._data.features.find(f =>
+              (f.properties.LSGD || '').toLowerCase() === lsgName.toLowerCase()
+            );
+            if (found) { match = found; break; }
+          }
+
+          if (!match || !match.properties.wikidata) {
+            // No wikidata — just show basic popup without loading message
+            popup.setHTML(`
+              <div class="pu-layer">Ward · ${lsgType}</div>
+              <div class="pu-name">${wardName}</div>
+              <div class="pu-details">
+                <div><strong>Ward No:</strong> ${wardNo}</div>
+                <div><strong>LSG Body:</strong> ${lsgName}</div>
+                <div><strong>District:</strong> ${district}</div>
+              </div>
+            `);
+            return;
+          }
+
+          if (!match) {
+            popup.setHTML(`
+              <div class="pu-layer">Ward · ${lsgType}</div>
+              <div class="pu-name">${wardName}</div>
+              <div class="pu-details">
+                <div><strong>Ward No:</strong> ${wardNo}</div>
+                <div><strong>LSG Body:</strong> ${lsgName}</div>
+                <div><strong>District:</strong> ${district}</div>
+              </div>
+            `);
+            return;
+          }
+
+          // Search Wikidata by name
+          fetch(`https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(lsgName+' Kerala')}&language=en&format=json&origin=*&limit=1`)
+            .then(r => r.json())
+            .then(data => {
+              const qid = data.search && data.search[0] ? data.search[0].id : null;
+              if (!qid) return;
+              return fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&format=json&props=claims|labels|sitelinks&languages=en|ml&origin=*`)
+                .then(r => r.json());
+            })
+            .then(r => r.json())
+            .then(data => {
+              const entity = data.entities[qid];
+              if (!entity) return;
+              const claims = entity.claims || {};
+              const labels = entity.labels || {};
+              const sitelinks = entity.sitelinks || {};
+              const mlName = labels.ml ? labels.ml.value : null;
+
+              let population = null;
+              if (claims.P1082 && claims.P1082.length) {
+                const popClaim = claims.P1082.sort((a,b) => {
+                  const aY = a.qualifiers?.P585?.[0]?.datavalue?.value?.time || '';
+                  const bY = b.qualifiers?.P585?.[0]?.datavalue?.value?.time || '';
+                  return bY.localeCompare(aY);
+                })[0];
+                const raw = popClaim?.mainsnak?.datavalue?.value?.amount;
+                if (raw) population = parseInt(raw).toLocaleString('en-IN');
+              }
+
+              let area = null;
+              if (claims.P2046 && claims.P2046.length) {
+                const raw = claims.P2046[0]?.mainsnak?.datavalue?.value?.amount;
+                if (raw) area = parseFloat(raw).toFixed(2) + ' km²';
+              }
+
+              const wiki = sitelinks.enwiki
+                ? `https://en.wikipedia.org/wiki/${encodeURIComponent(sitelinks.enwiki.title)}`
+                : null;
+
+              if (popup.isOpen()) {
+                popup.setHTML(`
+                  <div class="pu-layer">Ward · ${lsgType}</div>
+                  <div class="pu-name">${wardName}</div>
+                  <div class="pu-details">
+                    <div><strong>Ward No:</strong> ${wardNo}</div>
+                    <div><strong>District:</strong> ${district}</div>
+                    <div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;">
+                      <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:#aaa;margin-bottom:3px">Panchayat</div>
+                      <div style="font-weight:500;color:#1c1c1c">${lsgName}${mlName ? ` · ${mlName}` : ''}</div>
+                      ${population ? `<div><strong>Population:</strong> ${population}</div>` : ''}
+                      ${area ? `<div><strong>Area:</strong> ${area}</div>` : ''}
+                      ${wiki ? `<div style="margin-top:5px"><a href="${wiki}" target="_blank" style="color:#c0392b;text-decoration:none;font-size:11px">📖 Wikipedia →</a></div>` : ''}
+                    </div>
+                  </div>
+                `);
+              }
+            })
+            .catch(() => {});
         });
         map.on('mouseenter',sid+'-fill',()=>{map.getCanvas().style.cursor='pointer';});
         map.on('mouseleave',sid+'-fill',()=>{map.getCanvas().style.cursor='';});
