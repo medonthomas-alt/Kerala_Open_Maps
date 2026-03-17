@@ -418,6 +418,7 @@ body {
 
 <script>
 const CDN = 'https://cdn.jsdelivr.net/gh/medonthomas-alt/Kerala_Open_Maps@main/data';
+const RAW = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data';
 const WARD_CDN = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/local-governance/wards';
 
 const LAYERS = {
@@ -464,7 +465,7 @@ const LAYERS = {
     lz:9, ls:11, lb:false
   },
   lsg_gp: {
-    url: CDN+'/local-governance/lsg-split/Kerala_LSG_GramPanchayat.geojson',
+    url: RAW+'/local-governance/lsg-split/Kerala_LSG_GramPanchayat.geojson',
     color:'#6c3483', lw:0.8, fo:0.07,
     nf:'LSGD', df:[['District','District']], label:'Gram Panchayat',
     lz:10, ls:10, lb:false
