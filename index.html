@@ -20,319 +20,236 @@
   --panel: 270px;
 }
 
-body {
-  font-family: 'Inter', sans-serif;
-  height: 100vh;
-  display: flex;
-  overflow: hidden;
-  background: var(--bg);
-}
+body { font-family:'Inter',sans-serif; height:100vh; display:flex; overflow:hidden; background:var(--bg); }
 
+/* ── Sidebar ─────────────────────────────────────────────── */
 #sidebar {
-  width: var(--panel);
-  background: var(--white);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-  flex-shrink: 0;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.06);
+  width:var(--panel); background:var(--white);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  z-index:10; flex-shrink:0;
+  box-shadow:2px 0 12px rgba(0,0,0,0.06);
 }
+#sidebar-header { padding:18px 18px 14px; border-bottom:1px solid var(--border); background:#1c1c1c; }
+#sidebar-header h1 { font-family:'Playfair Display',serif; font-size:17px; color:#fff; letter-spacing:-0.2px; line-height:1.2; }
+#sidebar-header p  { font-size:10px; color:rgba(255,255,255,0.5); margin-top:3px; letter-spacing:0.8px; text-transform:uppercase; font-weight:300; }
 
-#sidebar-header {
-  padding: 18px 18px 14px;
-  border-bottom: 1px solid var(--border);
-  background: #1c1c1c;
-}
-
-#sidebar-header h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 17px;
-  color: #fff;
-  letter-spacing: -0.2px;
-  line-height: 1.2;
-}
-
-#sidebar-header p {
-  font-size: 10px;
-  color: rgba(255,255,255,0.5);
-  margin-top: 3px;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  font-weight: 300;
-}
-
-#search-wrap {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-
+#search-wrap { padding:12px 14px; border-bottom:1px solid var(--border); position:relative; }
 #search-input {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  width:100%; padding:8px 10px;
+  border:1px solid var(--border); border-radius:5px;
+  font-family:'Inter',sans-serif; font-size:12px;
+  background:var(--bg); color:var(--text); outline:none;
+  transition:border-color 0.15s,box-shadow 0.15s;
 }
-
-#search-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(192,57,43,0.08);
-}
-
-#search-input::placeholder { color: #aaa; }
+#search-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(192,57,43,0.08); }
+#search-input::placeholder { color:#aaa; }
 
 #search-results {
-  position: absolute;
-  left: 14px; right: 14px;
-  top: calc(100% - 2px);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  background: var(--white);
-  overflow: hidden;
-  display: none;
-  z-index: 100;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  position:absolute; left:14px; right:14px; top:calc(100% - 2px);
+  border:1px solid var(--border); border-radius:5px;
+  background:var(--white); overflow:hidden; display:none;
+  z-index:100; box-shadow:0 4px 16px rgba(0,0,0,0.1);
 }
+.search-item { padding:9px 12px; font-size:12px; cursor:pointer; border-bottom:1px solid #f0ede6; transition:background 0.1s; }
+.search-item:last-child { border-bottom:none; }
+.search-item:hover { background:var(--bg); }
+.search-item strong { display:block; font-size:12px; font-weight:500; }
+.search-item span   { color:var(--muted); font-size:11px; font-weight:300; }
 
-.search-item {
-  padding: 9px 12px;
-  font-size: 12px;
-  cursor: pointer;
-  border-bottom: 1px solid #f0ede6;
-  transition: background 0.1s;
-}
-.search-item:last-child { border-bottom: none; }
-.search-item:hover { background: var(--bg); }
-.search-item strong { display: block; font-size: 12px; font-weight: 500; }
-.search-item span { color: var(--muted); font-size: 11px; font-weight: 300; }
-
-#layers-wrap {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 14px;
-}
+#layers-wrap { flex:1; overflow-y:auto; padding:12px 14px; }
 
 .group-title {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--muted);
-  font-weight: 600;
-  margin: 12px 0 6px 2px;
+  font-size:9px; text-transform:uppercase; letter-spacing:1.2px;
+  color:var(--muted); font-weight:600; margin:12px 0 6px 2px;
 }
-.group-title:first-child { margin-top: 4px; }
+.group-title:first-child { margin-top:4px; }
 
 .layer-row {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 6px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 1px;
-  transition: background 0.12s;
-  user-select: none;
+  display:flex; align-items:center; gap:9px;
+  padding:6px 8px; border-radius:5px; cursor:pointer;
+  margin-bottom:1px; transition:background 0.12s; user-select:none;
 }
-.layer-row:hover { background: var(--bg); }
+.layer-row:hover { background:var(--bg); }
+.layer-swatch { width:12px; height:12px; border-radius:2px; flex-shrink:0; }
+.layer-name   { font-size:12px; font-weight:400; flex:1; color:var(--text); }
+.layer-count  { font-size:10px; color:var(--muted); font-weight:300; }
 
-.layer-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
-.layer-name   { font-size: 12px; font-weight: 400; flex: 1; color: var(--text); }
-.layer-count  { font-size: 10px; color: var(--muted); font-weight: 300; }
+.toggle { width:30px; height:16px; background:#d0cdc7; border-radius:8px; position:relative; transition:background 0.18s; flex-shrink:0; }
+.toggle::after { content:''; position:absolute; width:12px; height:12px; background:white; border-radius:50%; top:2px; left:2px; transition:transform 0.18s; box-shadow:0 1px 3px rgba(0,0,0,0.25); }
+.layer-row.on .toggle { background:var(--accent); }
+.layer-row.on .toggle::after { transform:translateX(14px); }
 
-.toggle {
-  width: 30px; height: 16px;
-  background: #d0cdc7;
-  border-radius: 8px;
-  position: relative;
-  transition: background 0.18s;
-  flex-shrink: 0;
-}
-.toggle::after {
-  content: '';
-  position: absolute;
-  width: 12px; height: 12px;
-  background: white;
-  border-radius: 50%;
-  top: 2px; left: 2px;
-  transition: transform 0.18s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
-}
-.layer-row.on .toggle { background: var(--accent); }
-.layer-row.on .toggle::after { transform: translateX(14px); }
+#sidebar-footer { padding:10px 14px; border-top:1px solid var(--border); font-size:10px; color:var(--muted); line-height:1.6; }
+#sidebar-footer a { color:var(--accent); text-decoration:none; }
 
-#sidebar-footer {
-  padding: 10px 14px;
-  border-top: 1px solid var(--border);
-  font-size: 10px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-#sidebar-footer a { color: var(--accent); text-decoration: none; }
-
-#map { flex: 1; height: 100vh; }
+/* ── Map area ─────────────────────────────────────────────── */
+#map { flex:1; height:100vh; position:relative; }
 
 #loading {
-  position: absolute;
-  top: 14px; right: 14px;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 11px;
-  color: var(--muted);
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: opacity 0.3s;
+  position:absolute; top:14px; right:14px;
+  background:white; border:1px solid var(--border); border-radius:6px;
+  padding:8px 12px; font-size:11px; color:var(--muted);
+  z-index:20; display:flex; align-items:center; gap:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:opacity 0.3s;
 }
-#loading.hidden { opacity: 0; pointer-events: none; }
+#loading.hidden { opacity:0; pointer-events:none; }
 
-.spinner {
-  width: 12px; height: 12px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+.spinner { width:12px; height:12px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── Choropleth floating toolbar ─────────────────────────── */
+#choro-bar {
+  position:absolute;
+  top:14px;
+  left:calc(var(--panel) + 16px);
+  right:56px; /* clear nav controls */
+  z-index:20;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+.choro-btn {
+  height:32px;
+  padding:0 12px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:white;
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  font-weight:500;
+  color:var(--text);
+  cursor:pointer;
+  white-space:nowrap;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  transition:background 0.15s,border-color 0.15s,color 0.15s;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.choro-btn:hover { background:var(--bg); }
+.choro-btn.active { background:#1c1c1c; border-color:#1c1c1c; color:#fff; }
+
+.choro-select {
+  height:32px;
+  padding:0 28px 0 10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236e6e6e'/%3E%3C/svg%3E") no-repeat right 10px center;
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  color:var(--text);
+  cursor:pointer;
+  appearance:none;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  min-width:130px;
+  max-width:180px;
+  transition:border-color 0.15s;
+}
+.choro-select:focus { outline:none; border-color:var(--accent); }
+.choro-select:disabled { opacity:0.45; cursor:not-allowed; }
+
+.choro-label {
+  font-size:10px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+#choro-controls { display:none; align-items:center; gap:6px; flex-wrap:wrap; }
+#choro-controls.visible { display:flex; }
+
+/* ── Legend ──────────────────────────────────────────────── */
+#choro-legend {
+  position:absolute;
+  bottom:32px;
+  left:calc(var(--panel) + 16px);
+  background:white;
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:10px 13px;
+  z-index:20;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+  display:none;
+  min-width:200px;
+}
+#choro-legend.visible { display:block; }
+#legend-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.8px; color:var(--muted); margin-bottom:7px; }
+#legend-scale { display:flex; height:10px; border-radius:3px; overflow:hidden; margin-bottom:5px; }
+.legend-seg { flex:1; }
+#legend-labels { display:flex; justify-content:space-between; font-size:9px; color:var(--muted); }
+
+/* ── Reset filter button ─────────────────────────────────── */
+#reset-filter {
+  display:none;
+  position:absolute;
+  bottom:32px;
+  right:16px;
+  z-index:20;
+  background:var(--accent);
+  color:white;
+  border:none;
+  border-radius:6px;
+  padding:7px 12px;
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  font-weight:500;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(192,57,43,0.3);
+}
+#reset-filter:hover { background:#a93226; }
 
 /* ── Popup ───────────────────────────────────────────────── */
 .maplibregl-popup-content {
-  font-family: 'Inter', sans-serif !important;
-  padding: 0 !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.14) !important;
-  max-width: 270px !important;
-  border: 1px solid var(--border) !important;
-  overflow: hidden !important;
+  font-family:'Inter',sans-serif !important;
+  padding:0 !important;
+  border-radius:8px !important;
+  box-shadow:0 4px 24px rgba(0,0,0,0.14) !important;
+  max-width:270px !important;
+  border:1px solid var(--border) !important;
+  overflow:hidden !important;
 }
+.maplibregl-popup-close-button { padding:4px 8px !important; font-size:14px !important; color:rgba(255,255,255,0.6) !important; right:0 !important; top:0 !important; z-index:1; }
+.maplibregl-popup-close-button:hover { color:#fff !important; background:rgba(255,255,255,0.12) !important; }
 
-.maplibregl-popup-close-button {
-  padding: 4px 8px !important;
-  font-size: 14px !important;
-  color: rgba(255,255,255,0.6) !important;
-  right: 0 !important; top: 0 !important;
-  z-index: 1;
-}
-.maplibregl-popup-close-button:hover { color: #fff !important; background: rgba(255,255,255,0.12) !important; }
+.pu-header { padding:10px 32px 10px 12px; background:#1c1c1c; }
+.pu-layer  { font-size:9px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.45); font-weight:600; margin-bottom:2px; }
+.pu-name   { font-family:'Playfair Display',serif; font-size:15px; color:#fff; line-height:1.25; }
+.pu-ml     { font-size:12px; color:rgba(255,255,255,0.5); margin-top:2px; font-weight:300; }
+.pu-body   { padding:10px 12px; }
 
-.pu-header {
-  padding: 10px 32px 10px 12px;
-  background: #1c1c1c;
-}
-.pu-layer {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,0.45);
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-.pu-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 15px;
-  color: #fff;
-  line-height: 1.25;
-}
-.pu-ml {
-  font-size: 12px;
-  color: rgba(255,255,255,0.5);
-  margin-top: 2px;
-  font-weight: 300;
-}
+.pu-stats  { display:grid; grid-template-columns:1fr 1fr; gap:5px 6px; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+.pu-stat   { background:var(--bg); border-radius:4px; padding:5px 7px; }
+.pu-stat-label { font-size:9px; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted); font-weight:600; }
+.pu-stat-val   { font-size:13px; font-weight:600; color:var(--text); margin-top:1px; }
 
-.pu-body { padding: 10px 12px; }
+.pu-rows { font-size:11px; line-height:1.8; color:var(--muted); }
+.pu-rows strong { color:var(--text); font-weight:500; }
 
-/* 2-col stat grid */
-.pu-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5px 6px;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-.pu-stat {
-  background: var(--bg);
-  border-radius: 4px;
-  padding: 5px 7px;
-}
-.pu-stat-label {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--muted);
-  font-weight: 600;
-}
-.pu-stat-val {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  margin-top: 1px;
-}
+.pu-wiki { margin-top:7px; padding-top:7px; border-top:1px solid var(--border); }
+.pu-wiki a { color:var(--accent); text-decoration:none; font-size:11px; font-weight:500; }
 
-.pu-rows {
-  font-size: 11px;
-  line-height: 1.8;
-  color: var(--muted);
-}
-.pu-rows strong { color: var(--text); font-weight: 500; }
+.pu-simple { padding:12px 14px; }
+.pu-simple .pu-layer   { color:var(--muted); margin-bottom:3px; }
+.pu-simple .pu-name    { font-family:'Playfair Display',serif; font-size:15px; color:var(--text); margin-bottom:6px; line-height:1.2; }
+.pu-simple .pu-details { font-size:11px; color:var(--muted); line-height:1.7; }
+.pu-simple .pu-details strong { color:var(--text); font-weight:500; }
 
-.pu-wiki {
-  margin-top: 7px;
-  padding-top: 7px;
-  border-top: 1px solid var(--border);
-}
-.pu-wiki a {
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 11px;
-  font-weight: 500;
-}
+#layers-wrap::-webkit-scrollbar { width:3px; }
+#layers-wrap::-webkit-scrollbar-track { background:transparent; }
+#layers-wrap::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
-/* Simple popup (non-GP/non-enriched) */
-.pu-simple { padding: 12px 14px; }
-.pu-simple .pu-layer  { color: var(--muted); margin-bottom: 3px; }
-.pu-simple .pu-name   { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--text); margin-bottom: 6px; line-height: 1.2; }
-.pu-simple .pu-details { font-size: 11px; color: var(--muted); line-height: 1.7; }
-.pu-simple .pu-details strong { color: var(--text); font-weight: 500; }
+#mob-btn { display:none; position:absolute; top:12px; left:12px; z-index:20; background:white; border:1px solid var(--border); border-radius:5px; padding:7px 10px; cursor:pointer; font-size:16px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
 
-#layers-wrap::-webkit-scrollbar { width: 3px; }
-#layers-wrap::-webkit-scrollbar-track { background: transparent; }
-#layers-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-#mob-btn {
-  display: none;
-  position: absolute;
-  top: 12px; left: 12px;
-  z-index: 20;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 7px 10px;
-  cursor: pointer;
-  font-size: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-@media (max-width: 600px) {
-  #mob-btn { display: block; }
-  #sidebar {
-    position: absolute;
-    left: -100%; top: 0; height: 100%;
-    transition: left 0.25s;
-    z-index: 15;
-  }
-  #sidebar.open { left: 0; }
+@media (max-width:600px) {
+  #mob-btn { display:block; }
+  #sidebar { position:absolute; left:-100%; top:0; height:100%; transition:left 0.25s; z-index:15; }
+  #sidebar.open { left:0; }
+  #choro-bar { left:12px; right:56px; top:56px; }
 }
 </style>
 </head>
@@ -345,446 +262,490 @@ body {
     <h1>Kerala Open Maps</h1>
     <p>Administrative &amp; Electoral Boundaries</p>
   </div>
-
   <div id="search-wrap">
     <input type="text" id="search-input" placeholder="Search districts, villages, constituencies…">
     <div id="search-results"></div>
   </div>
-
   <div id="layers-wrap">
-
     <div class="group-title">Administrative</div>
-
-    <div class="layer-row on" data-layer="state" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#c0392b"></div>
-      <span class="layer-name">State</span>
-      <span class="layer-count">1</span>
-      <div class="toggle"></div>
-    </div>
-
-    <div class="layer-row on" data-layer="districts" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#1a5276"></div>
-      <span class="layer-name">Districts</span>
-      <span class="layer-count">14</span>
-      <div class="toggle"></div>
-    </div>
-
-    <div class="layer-row" data-layer="subdistricts" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#148f77"></div>
-      <span class="layer-name">Sub-Districts</span>
-      <span class="layer-count">76</span>
-      <div class="toggle"></div>
-    </div>
-
-    <div class="layer-row" data-layer="blocks" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#b7770d"></div>
-      <span class="layer-name">Blocks</span>
-      <span class="layer-count">152</span>
-      <div class="toggle"></div>
-    </div>
-
-    <div class="layer-row" data-layer="villages" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#784212"></div>
-      <span class="layer-name">Villages</span>
-      <span class="layer-count">1,623</span>
-      <div class="toggle"></div>
-    </div>
-
+    <div class="layer-row on" data-layer="state" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#c0392b"></div><span class="layer-name">State</span><span class="layer-count">1</span><div class="toggle"></div></div>
+    <div class="layer-row on" data-layer="districts" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#1a5276"></div><span class="layer-name">Districts</span><span class="layer-count">14</span><div class="toggle"></div></div>
+    <div class="layer-row" data-layer="subdistricts" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#148f77"></div><span class="layer-name">Sub-Districts</span><span class="layer-count">76</span><div class="toggle"></div></div>
+    <div class="layer-row" data-layer="blocks" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#b7770d"></div><span class="layer-name">Blocks</span><span class="layer-count">152</span><div class="toggle"></div></div>
+    <div class="layer-row" data-layer="villages" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#784212"></div><span class="layer-name">Villages</span><span class="layer-count">1,623</span><div class="toggle"></div></div>
     <div class="group-title">Electoral</div>
-
-    <div class="layer-row" data-layer="parliament" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#922b21"></div>
-      <span class="layer-name">Parliamentary</span>
-      <span class="layer-count">20</span>
-      <div class="toggle"></div>
-    </div>
-
-    <div class="layer-row" data-layer="assembly" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#1f618d"></div>
-      <span class="layer-name">Assembly</span>
-      <span class="layer-count">141</span>
-      <div class="toggle"></div>
-    </div>
-
+    <div class="layer-row" data-layer="parliament" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#922b21"></div><span class="layer-name">Parliamentary</span><span class="layer-count">20</span><div class="toggle"></div></div>
+    <div class="layer-row" data-layer="assembly" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#1f618d"></div><span class="layer-name">Assembly</span><span class="layer-count">141</span><div class="toggle"></div></div>
     <div class="group-title">Local Governance</div>
-
-    <div class="layer-row" data-layer="lsg_corp" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#922b21"></div>
-      <span class="layer-name">Corporations</span>
-      <span class="layer-count">6</span>
-      <div class="toggle"></div>
-    </div>
-
-    <div class="layer-row" data-layer="lsg_muni" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#1a6b3c"></div>
-      <span class="layer-name">Municipalities</span>
-      <span class="layer-count">87</span>
-      <div class="toggle"></div>
-    </div>
-
-    <div class="layer-row" data-layer="lsg_gp" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#6c3483"></div>
-      <span class="layer-name">Gram Panchayats</span>
-      <span class="layer-count">941</span>
-      <div class="toggle"></div>
-    </div>
-
-    <div class="layer-row" data-layer="wards" onclick="toggleLayer(this)">
-      <div class="layer-swatch" style="background:#0e6655"></div>
-      <span class="layer-name">Wards</span>
-      <span class="layer-count">~21,000</span>
-      <div class="toggle"></div>
-    </div>
+    <div class="layer-row" data-layer="lsg_corp" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#922b21"></div><span class="layer-name">Corporations</span><span class="layer-count">6</span><div class="toggle"></div></div>
+    <div class="layer-row" data-layer="lsg_muni" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#1a6b3c"></div><span class="layer-name">Municipalities</span><span class="layer-count">87</span><div class="toggle"></div></div>
+    <div class="layer-row" data-layer="lsg_gp" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#6c3483"></div><span class="layer-name">Gram Panchayats</span><span class="layer-count">941</span><div class="toggle"></div></div>
+    <div class="layer-row" data-layer="wards" onclick="toggleLayer(this)"><div class="layer-swatch" style="background:#0e6655"></div><span class="layer-name">Wards</span><span class="layer-count">~21,000</span><div class="toggle"></div></div>
     <div id="ward-note" style="font-size:10px;color:#888;padding:4px 8px 6px 29px;line-height:1.5;display:none;">
-      ⚠️ Ward boundaries (2024) may not align with LSG boundaries (2020) — different sources.<br>
+      ⚠️ Ward boundaries (2024) may not align with LSG boundaries (2020).<br>
       <span id="ward-progress" style="color:#0e6655;font-weight:500;"></span>
     </div>
-
   </div>
-
   <div id="sidebar-footer">
     Sources: LGD · ECI · OSM Kerala · Delimitation Commission<br>
     <a href="https://github.com/medonthomas-alt/Kerala_Open_Maps" target="_blank">GitHub</a> · ODbL License
   </div>
 </div>
 
-<div id="map"></div>
-<div id="loading"><div class="spinner"></div> Loading…</div>
+<!-- Map -->
+<div id="map">
+  <!-- Choropleth floating toolbar -->
+  <div id="choro-bar">
+    <button class="choro-btn" id="choro-toggle" onclick="toggleChoropleth()">
+      <span id="choro-icon">◑</span> Choropleth
+    </button>
+    <div id="choro-controls">
+      <span class="choro-label">Metric</span>
+      <select class="choro-select" id="choro-metric" onchange="applyChoropleth()">
+        <option value="pop_density">Population Density</option>
+        <option value="population">Total Population</option>
+        <option value="households">Households</option>
+      </select>
+      <span class="choro-label">District</span>
+      <select class="choro-select" id="filter-district" onchange="applyDistrictFilter()">
+        <option value="">All Districts</option>
+        <option>Alappuzha</option><option>Ernakulam</option><option>Idukki</option>
+        <option>Kannur</option><option>Kasaragod</option><option>Kollam</option>
+        <option>Kottayam</option><option>Kozhikode</option><option>Malappuram</option>
+        <option>Palakkad</option><option>Pathanamthitta</option>
+        <option>Thiruvananthapuram</option><option>Thrissur</option><option>Wayanad</option>
+      </select>
+      <span class="choro-label">Panchayat</span>
+      <select class="choro-select" id="filter-panchayat" onchange="applyPanchayatFilter()" disabled>
+        <option value="">All Panchayats</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div id="choro-legend">
+    <div id="legend-title">Population Density (per km²)</div>
+    <div id="legend-scale"></div>
+    <div id="legend-labels"></div>
+  </div>
+
+  <!-- Reset filter button -->
+  <button id="reset-filter" onclick="resetFilters()">✕ Clear Filter</button>
+
+  <div id="loading"><div class="spinner"></div> Loading…</div>
+</div>
 
 <script>
 const CDN      = 'https://cdn.jsdelivr.net/gh/medonthomas-alt/Kerala_Open_Maps@main/data';
 const RAW      = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data';
 const WARD_CDN = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/local-governance/wards';
 
-// Wikidata QID map — for muni/corp enrichment + ward Wikipedia links
 window.lsgWikidataMap = {};
-// GP data map — keyed by lowercase LSGD name → enriched properties
-window.gpDataMap = {};
+window.gpDataMap      = {};
 
 fetch(CDN+'/local-governance/lsg/kerala_lsg_data.geojson')
   .then(r=>r.json())
-  .then(data=>{
-    data.features.forEach(f=>{
-      const name = (f.properties.name||'').toLowerCase();
-      const qid  = f.properties.wikidata;
-      if (name && qid) window.lsgWikidataMap[name] = qid;
-    });
-    console.log('Wikidata map:', Object.keys(window.lsgWikidataMap).length, 'entries');
-  }).catch(()=>{});
+  .then(d=>{ d.features.forEach(f=>{ const n=(f.properties.name||'').toLowerCase(); const q=f.properties.wikidata; if(n&&q) window.lsgWikidataMap[n]=q; }); })
+  .catch(()=>{});
 
-const LAYERS = {
-  state:       { url:CDN+'/administrative/state/Kerala_LGD_States.geojson',        color:'#c0392b', lw:3,   fo:0.07, nf:'STNAME',    df:[], label:'State', lz:6, ls:16, lb:true },
-  districts:   { url:CDN+'/administrative/districts/Kerala_LGD_Districts.geojson', color:'#1a5276', lw:2,   fo:0.07, nf:'dtname',    df:[['stname','State']], label:'District', lz:7, ls:13, lb:true },
-  subdistricts:{ url:CDN+'/administrative/subdistricts/Kerala_LGD_Subdistricts.geojson', color:'#148f77', lw:1.2, fo:0.07, nf:'sdtname', df:[['dtname','District']], label:'Sub-District', lz:9, ls:11, lb:false },
-  blocks:      { url:CDN+'/administrative/blocks/Kerala_LGD_Blocks.geojson',        color:'#b7770d', lw:1,   fo:0.07, nf:'block_name',df:[['district','District']], label:'Block', lz:9, ls:11, lb:false },
-  villages:    { url:CDN+'/administrative/villages/Kerala_LGD_Villages.geojson',    color:'#784212', lw:0.6, fo:0.06, nf:'vilname11', df:[['sdtname','Sub-District'],['dtname','District']], label:'Village', lz:12, ls:10, lb:false },
-  parliament:  { url:CDN+'/electoral/parliamentary/Kerala_LGD_Parliament_Constituencies.geojson', color:'#922b21', lw:2.5, fo:0.07, nf:'pc_name', df:[['st_name','State']], label:'Parliamentary Constituency', lz:7, ls:12, lb:true },
-  assembly:    { url:CDN+'/electoral/assembly/Kerala_LGD_Assembly_Constituencies.geojson', color:'#1f618d', lw:1.5, fo:0.07, nf:'ac_name', df:[['dist_name','District'],['pc_name','Parliament']], label:'Assembly Constituency', lz:9, ls:11, lb:false },
-  lsg_gp:      { url:RAW+'/local-governance/lsg-split/Kerala_LSG_GramPanchayat.geojson',  color:'#6c3483', lw:0.8, fo:0.07, nf:'LSGD', df:[['District','District']], label:'Gram Panchayat', lz:10, ls:10, lb:false },
-  lsg_muni:    { url:CDN+'/local-governance/lsg-split/Kerala_LSG_Municipality.geojson',   color:'#1a6b3c', lw:1.2, fo:0.08, nf:'LSGD', df:[['District','District']], label:'Municipality', lz:9, ls:11, lb:false },
-  lsg_corp:    { url:CDN+'/local-governance/lsg-split/Kerala_LSG_Corporation.geojson',    color:'#922b21', lw:2,   fo:0.09, nf:'LSGD', df:[['District','District']], label:'Municipal Corporation', lz:8, ls:13, lb:true }
+// ── Choropleth config ────────────────────────────────────────
+const METRICS = {
+  pop_density: {
+    label:'Population Density (per km²)',
+    colors:['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f'],
+    fmt: v => Math.round(v).toLocaleString('en-IN')
+  },
+  population: {
+    label:'Total Population',
+    colors:['#feedde','#fdd0a2','#fdae6b','#f16913','#8c2d04'],
+    fmt: v => Math.round(v).toLocaleString('en-IN')
+  },
+  households: {
+    label:'Households',
+    colors:['#edf8e9','#c7e9c0','#a1d99b','#41ab5d','#006d2c'],
+    fmt: v => Math.round(v).toLocaleString('en-IN')
+  }
 };
 
-const DISTRICTS = ['Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod',
-  'Kollam','Kottayam','Kozhikode','Malappuram','Palakkad',
-  'Pathanamthitta','Thiruvanathapuram','Thrissur','Wayanad'];
+// Quantile breaks stored after GP data loads
+window.gpQuantiles = {};
+let choroActive = false;
+
+// Compute 5-class quantile breaks for a metric from all GP features
+function computeQuantiles(features, field) {
+  const vals = features
+    .map(f => parseFloat(f.properties[field]))
+    .filter(v => !isNaN(v) && v > 0)
+    .sort((a,b) => a-b);
+  if (!vals.length) return [0,0,0,0,0];
+  const q = i => vals[Math.floor(i * (vals.length-1) / 4)];
+  return [q(0), q(1), q(2), q(3), q(4)];
+}
+
+function toggleChoropleth() {
+  choroActive = !choroActive;
+  const btn      = document.getElementById('choro-toggle');
+  const controls = document.getElementById('choro-controls');
+  const legend   = document.getElementById('choro-legend');
+
+  btn.classList.toggle('active', choroActive);
+  controls.classList.toggle('visible', choroActive);
+  legend.classList.toggle('visible', choroActive);
+
+  if (choroActive) {
+    // Turn on GP layer if it's off
+    const gpRow = document.querySelector('[data-layer="lsg_gp"]');
+    if (gpRow && !gpRow.classList.contains('on')) toggleLayer(gpRow);
+    applyChoropleth();
+  } else {
+    resetChoropleth();
+  }
+}
+
+function applyChoropleth() {
+  if (!choroActive) return;
+  const metric   = document.getElementById('choro-metric').value;
+  const cfg      = METRICS[metric];
+  const quantiles= window.gpQuantiles[metric];
+  if (!quantiles || !window._map.getLayer('lsg_gp-fill')) return;
+
+  const [q0,q1,q2,q3,q4] = quantiles;
+
+  // MapLibre step expression: value < q1→col0, q1→col1, q2→col2, q3→col3, q4→col4
+  window._map.setPaintProperty('lsg_gp-fill','fill-color',[
+    'step',['to-number',['get',metric],'0'],
+    cfg.colors[0],
+    q1, cfg.colors[1],
+    q2, cfg.colors[2],
+    q3, cfg.colors[3],
+    q4, cfg.colors[4]
+  ]);
+  window._map.setPaintProperty('lsg_gp-fill','fill-opacity',0.85);
+
+  // Update legend
+  document.getElementById('legend-title').textContent = cfg.label;
+  const scaleEl = document.getElementById('legend-scale');
+  scaleEl.innerHTML = cfg.colors.map(c=>`<div class="legend-seg" style="background:${c}"></div>`).join('');
+  const labelsEl = document.getElementById('legend-labels');
+  labelsEl.innerHTML = [q0,q1,q2,q3,q4].map(v=>`<span>${cfg.fmt(v)}</span>`).join('');
+}
+
+function resetChoropleth() {
+  if (!window._map.getLayer('lsg_gp-fill')) return;
+  window._map.setPaintProperty('lsg_gp-fill','fill-color','#6c3483');
+  window._map.setPaintProperty('lsg_gp-fill','fill-opacity',0.07);
+}
+
+// ── District & Panchayat filters ─────────────────────────────
+let activeFilter = { district:'', panchayat:'' };
+
+function applyDistrictFilter() {
+  const dist = document.getElementById('filter-district').value;
+  activeFilter.district  = dist;
+  activeFilter.panchayat = '';
+
+  // Update panchayat dropdown
+  const pSel = document.getElementById('filter-panchayat');
+  pSel.innerHTML = '<option value="">All Panchayats</option>';
+
+  if (dist) {
+    // Populate panchayat options from gpDataMap
+    const panchayats = Object.values(window.gpDataMap)
+      .filter(p => (p.District||'').toLowerCase() === dist.toLowerCase() ||
+                   (p.district||'').toLowerCase() === dist.toLowerCase())
+      .map(p => p.LSGD || p.grama_panchayat || '')
+      .filter(Boolean)
+      .sort();
+    panchayats.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      pSel.appendChild(opt);
+    });
+    pSel.disabled = false;
+
+    // Filter GP layer to district
+    applyLayerFilter(dist, '');
+
+    // Fit map to district bounds
+    const src = window._map.getSource('lsg_gp');
+    if (src && src._data) {
+      const feats = src._data.features.filter(f =>
+        (f.properties.District||'').toLowerCase() === dist.toLowerCase()
+      );
+      fitToBounds(feats);
+    }
+
+    document.getElementById('reset-filter').style.display = 'block';
+  } else {
+    pSel.disabled = true;
+    applyLayerFilter('', '');
+    document.getElementById('reset-filter').style.display = 'none';
+  }
+
+  if (choroActive) applyChoropleth();
+}
+
+function applyPanchayatFilter() {
+  const panchayat = document.getElementById('filter-panchayat').value;
+  const district  = document.getElementById('filter-district').value;
+  activeFilter.panchayat = panchayat;
+
+  applyLayerFilter(district, panchayat);
+
+  if (panchayat) {
+    const src = window._map.getSource('lsg_gp');
+    if (src && src._data) {
+      const feats = src._data.features.filter(f =>
+        (f.properties.LSGD||'').toLowerCase() === panchayat.toLowerCase()
+      );
+      fitToBounds(feats, 80);
+    }
+    document.getElementById('reset-filter').style.display = 'block';
+  }
+}
+
+function applyLayerFilter(district, panchayat) {
+  if (!window._map.getLayer('lsg_gp-fill')) return;
+  let filter = null;
+
+  if (district && panchayat) {
+    filter = ['==',['get','LSGD'], panchayat];
+  } else if (district) {
+    // District field in GeoJSON may be 'Thiruvanathapuram' for TVM — normalise
+    filter = ['in', ['downcase',['get','District']], ['literal', [district.toLowerCase(), districtAlias(district)]]];
+  }
+
+  ['fill','line','hover','label'].forEach(t => {
+    const lid = 'lsg_gp-'+t;
+    if (window._map.getLayer(lid)) {
+      window._map.setFilter(lid, filter);
+    }
+  });
+}
+
+// Handle 'Thiruvanathapuram' spelling variant in GeoJSON
+function districtAlias(d) {
+  const map = {'thiruvananthapuram':'thiruvanathapuram','thiruvanathapuram':'thiruvananthapuram'};
+  return map[d.toLowerCase()] || d.toLowerCase();
+}
+
+function resetFilters() {
+  document.getElementById('filter-district').value  = '';
+  document.getElementById('filter-panchayat').value = '';
+  document.getElementById('filter-panchayat').disabled = true;
+  document.getElementById('reset-filter').style.display = 'none';
+  activeFilter = {district:'', panchayat:''};
+  applyLayerFilter('','');
+}
+
+function fitToBounds(features, padding=60) {
+  if (!features.length) return;
+  let minLng=180,maxLng=-180,minLat=90,maxLat=-90;
+  features.forEach(f=>{
+    const coords=[];
+    (function ex(a){ typeof a[0]==='number'?coords.push(a):a.forEach(ex); })(f.geometry.coordinates);
+    coords.forEach(([lng,lat])=>{ minLng=Math.min(minLng,lng); maxLng=Math.max(maxLng,lng); minLat=Math.min(minLat,lat); maxLat=Math.max(maxLat,lat); });
+  });
+  window._map.fitBounds([[minLng,minLat],[maxLng,maxLat]],{padding});
+}
+
+// ── Map init ─────────────────────────────────────────────────
+const LAYERS = {
+  state:        { url:CDN+'/administrative/state/Kerala_LGD_States.geojson',        color:'#c0392b', lw:3,   fo:0.07, nf:'STNAME',    df:[], label:'State', lz:6, ls:16, lb:true },
+  districts:    { url:CDN+'/administrative/districts/Kerala_LGD_Districts.geojson', color:'#1a5276', lw:2,   fo:0.07, nf:'dtname',    df:[['stname','State']], label:'District', lz:7, ls:13, lb:true },
+  subdistricts: { url:CDN+'/administrative/subdistricts/Kerala_LGD_Subdistricts.geojson', color:'#148f77', lw:1.2, fo:0.07, nf:'sdtname', df:[['dtname','District']], label:'Sub-District', lz:9, ls:11, lb:false },
+  blocks:       { url:CDN+'/administrative/blocks/Kerala_LGD_Blocks.geojson',        color:'#b7770d', lw:1,   fo:0.07, nf:'block_name',df:[['district','District']], label:'Block', lz:9, ls:11, lb:false },
+  villages:     { url:CDN+'/administrative/villages/Kerala_LGD_Villages.geojson',    color:'#784212', lw:0.6, fo:0.06, nf:'vilname11', df:[['sdtname','Sub-District'],['dtname','District']], label:'Village', lz:12, ls:10, lb:false },
+  parliament:   { url:CDN+'/electoral/parliamentary/Kerala_LGD_Parliament_Constituencies.geojson', color:'#922b21', lw:2.5, fo:0.07, nf:'pc_name', df:[['st_name','State']], label:'Parliamentary Constituency', lz:7, ls:12, lb:true },
+  assembly:     { url:CDN+'/electoral/assembly/Kerala_LGD_Assembly_Constituencies.geojson', color:'#1f618d', lw:1.5, fo:0.07, nf:'ac_name', df:[['dist_name','District'],['pc_name','Parliament']], label:'Assembly Constituency', lz:9, ls:11, lb:false },
+  lsg_gp:       { url:RAW+'/local-governance/lsg-split/Kerala_LSG_GramPanchayat.geojson',  color:'#6c3483', lw:0.8, fo:0.07, nf:'LSGD', df:[['District','District']], label:'Gram Panchayat', lz:10, ls:10, lb:false },
+  lsg_muni:     { url:CDN+'/local-governance/lsg-split/Kerala_LSG_Municipality.geojson',   color:'#1a6b3c', lw:1.2, fo:0.08, nf:'LSGD', df:[['District','District']], label:'Municipality', lz:9, ls:11, lb:false },
+  lsg_corp:     { url:CDN+'/local-governance/lsg-split/Kerala_LSG_Corporation.geojson',    color:'#922b21', lw:2,   fo:0.09, nf:'LSGD', df:[['District','District']], label:'Municipal Corporation', lz:8, ls:13, lb:true }
+};
+
+const DISTRICTS = ['Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod','Kollam','Kottayam','Kozhikode','Malappuram','Palakkad','Pathanamthitta','Thiruvanathapuram','Thrissur','Wayanad'];
 window.DISTRICTS = DISTRICTS;
 
 const loadedWards = new Set();
-let lc = 0;
+let lc=0;
 function loading(on){ lc=Math.max(0,lc+(on?1:-1)); document.getElementById('loading').classList.toggle('hidden',lc===0); }
 
 const map = new maplibregl.Map({
   container:'map',
-  style:{
-    version:8,
-    glyphs:'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
+  style:{ version:8, glyphs:'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
     sources:{osm:{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,attribution:'© OpenStreetMap'}},
     layers:[{id:'osm',type:'raster',source:'osm',paint:{'raster-opacity':0.2,'raster-saturation':-0.4}}]
   },
   center:[76.5,10.5], zoom:7, maxBounds:[[73,7],[81,14]]
 });
-window._map = map;
+window._map=map;
 map.addControl(new maplibregl.NavigationControl(),'top-right');
 map.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-left');
 
-const popup = new maplibregl.Popup({closeButton:true,closeOnClick:false,maxWidth:'280px'});
+const popup=new maplibregl.Popup({closeButton:true,closeOnClick:false,maxWidth:'280px'});
 
 function cap(s){ if(!s) return ''; return s.toString().toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()); }
-function fmt(n){ return n ? Number(n).toLocaleString('en-IN') : null; }
+function fmt(n){ return n?Number(n).toLocaleString('en-IN'):null; }
 
-// ── Popup builders ──────────────────────────────────────────
-
+// ── Popup builders ────────────────────────────────────────────
 function buildGPPopup(p) {
-  const name  = p.LSGD || 'Unknown';
-  const ml    = p.lgd_name_malayalam || '';
-  const pop   = fmt(p.population);
-  const area  = p.area_sqkm ? parseFloat(p.area_sqkm).toFixed(2)+' km²' : null;
-  const wards = p.wards     ? Math.round(p.wards) : null;
-  const hh    = fmt(p.households);
-  const block = cap(p.block_panchayat || '');
-  const taluk = cap(p.taluk || '');
-  const parl  = cap(p.parliament_constituency || '');
-  const assem = cap(p.assembly_constituency || '');
-  const dist  = cap(p.District || '');
-  const pins  = p.pincodes || '';
+  const name=p.LSGD||'Unknown', ml=p.lgd_name_malayalam||'';
+  const pop=fmt(p.population), area=p.area_sqkm?parseFloat(p.area_sqkm).toFixed(2)+' km²':null;
+  const wards=p.wards?Math.round(p.wards):null, hh=fmt(p.households);
+  const block=cap(p.block_panchayat||''), taluk=cap(p.taluk||'');
+  const parl=cap(p.parliament_constituency||''), assem=cap(p.assembly_constituency||'');
+  const dist=cap(p.District||''), pins=p.pincodes||'';
 
-  const stats = [];
-  if (pop)   stats.push(['Population', pop]);
-  if (area)  stats.push(['Area', area]);
-  if (wards) stats.push(['Wards', wards]);
-  if (hh)    stats.push(['Households', hh]);
+  const stats=[];
+  if(pop) stats.push(['Population',pop]); if(area) stats.push(['Area',area]);
+  if(wards) stats.push(['Wards',wards]); if(hh) stats.push(['Households',hh]);
+  const statsHTML=stats.length?`<div class="pu-stats">${stats.map(([l,v])=>`<div class="pu-stat"><div class="pu-stat-label">${l}</div><div class="pu-stat-val">${v}</div></div>`).join('')}</div>`:'';
 
-  const statsHTML = stats.length
-    ? `<div class="pu-stats">${stats.map(([l,v])=>`<div class="pu-stat"><div class="pu-stat-label">${l}</div><div class="pu-stat-val">${v}</div></div>`).join('')}</div>`
-    : '';
+  const rows=[];
+  if(dist) rows.push(`<div><strong>District:</strong> ${dist}</div>`);
+  if(block) rows.push(`<div><strong>Block:</strong> ${block}</div>`);
+  if(taluk) rows.push(`<div><strong>Taluk:</strong> ${taluk}</div>`);
+  if(parl) rows.push(`<div><strong>Parliament:</strong> ${parl}</div>`);
+  if(assem) rows.push(`<div><strong>Assembly:</strong> ${assem}</div>`);
+  if(pins) rows.push(`<div><strong>Pincode${pins.includes(',')? 's':''}:</strong> ${pins}</div>`);
 
-  const rows = [];
-  if (dist)  rows.push(`<div><strong>District:</strong> ${dist}</div>`);
-  if (block) rows.push(`<div><strong>Block:</strong> ${block}</div>`);
-  if (taluk) rows.push(`<div><strong>Taluk:</strong> ${taluk}</div>`);
-  if (parl)  rows.push(`<div><strong>Parliament:</strong> ${parl}</div>`);
-  if (assem) rows.push(`<div><strong>Assembly:</strong> ${assem}</div>`);
-  if (pins)  rows.push(`<div><strong>Pincode${pins.includes(',')? 's':''}:</strong> ${pins}</div>`);
-
-  const qid = window.lsgWikidataMap[name.toLowerCase()];
-
-  return {
-    html: `
-      <div class="pu-header">
-        <div class="pu-layer">Gram Panchayat</div>
-        <div class="pu-name">${cap(name)}</div>
-        ${ml ? `<div class="pu-ml">${ml}</div>` : ''}
-      </div>
-      <div class="pu-body">
-        ${statsHTML}
-        <div class="pu-rows">${rows.join('')}</div>
-        ${qid ? `<div class="pu-wiki" id="pu-wiki-${qid}"><span style="color:#bbb;font-style:italic;font-size:10px">Loading Wikipedia…</span></div>` : ''}
-      </div>`,
-    qid
-  };
+  const qid=window.lsgWikidataMap[name.toLowerCase()];
+  return { html:`
+    <div class="pu-header">
+      <div class="pu-layer">Gram Panchayat</div>
+      <div class="pu-name">${cap(name)}</div>
+      ${ml?`<div class="pu-ml">${ml}</div>`:''}
+    </div>
+    <div class="pu-body">
+      ${statsHTML}
+      <div class="pu-rows">${rows.join('')}</div>
+      ${qid?`<div class="pu-wiki" id="pu-wiki-${qid}"><span style="color:#bbb;font-style:italic;font-size:10px">Loading Wikipedia…</span></div>`:''}
+    </div>`, qid };
 }
 
 function fetchWikiLink(qid){
-  if (!qid) return;
+  if(!qid) return;
   fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&format=json&props=sitelinks&origin=*`)
-    .then(r=>r.json())
-    .then(data=>{
-      const sl = data.entities[qid]?.sitelinks;
-      const enwiki = sl?.enwiki;
-      if (!enwiki || !popup.isOpen()) return;
-      const el = document.getElementById(`pu-wiki-${qid}`);
-      if (el) el.innerHTML = `<a href="https://en.wikipedia.org/wiki/${encodeURIComponent(enwiki.title)}" target="_blank">📖 Wikipedia →</a>`;
-    })
-    .catch(()=>{ const el=document.getElementById(`pu-wiki-${qid}`); if(el) el.remove(); });
+    .then(r=>r.json()).then(data=>{
+      const enwiki=data.entities[qid]?.sitelinks?.enwiki;
+      if(!enwiki||!popup.isOpen()) return;
+      const el=document.getElementById(`pu-wiki-${qid}`);
+      if(el) el.innerHTML=`<a href="https://en.wikipedia.org/wiki/${encodeURIComponent(enwiki.title)}" target="_blank">📖 Wikipedia →</a>`;
+    }).catch(()=>{ const el=document.getElementById(`pu-wiki-${qid}`); if(el) el.remove(); });
 }
 
-function buildMuniCorpPopup(cfg, p, lngLat){
-  const name = p[cfg.nf] || 'Unknown';
-  let det = '';
-  cfg.df.forEach(([f,l])=>{ if(p[f]) det+=`<div><strong>${l}:</strong> ${cap(p[f])}</div>`; });
-  const qid = window.lsgWikidataMap[name.toLowerCase()];
+function buildMuniCorpPopup(cfg,p,lngLat){
+  const name=p[cfg.nf]||'Unknown';
+  let det=''; cfg.df.forEach(([f,l])=>{ if(p[f]) det+=`<div><strong>${l}:</strong> ${cap(p[f])}</div>`; });
+  const qid=window.lsgWikidataMap[name.toLowerCase()];
   popup.setLngLat(lngLat).setHTML(`
-    <div class="pu-header">
-      <div class="pu-layer">${cfg.label}</div>
-      <div class="pu-name">${cap(name)}</div>
-    </div>
-    <div class="pu-body">
-      <div class="pu-rows">${det}</div>
-      ${qid?`<div class="pu-wiki" id="pu-wiki-${qid}"><span style="color:#bbb;font-style:italic;font-size:10px">Loading details…</span></div>`:''}
+    <div class="pu-header"><div class="pu-layer">${cfg.label}</div><div class="pu-name">${cap(name)}</div></div>
+    <div class="pu-body"><div class="pu-rows">${det}</div>
+    ${qid?`<div class="pu-wiki" id="pu-wiki-${qid}"><span style="color:#bbb;font-style:italic;font-size:10px">Loading…</span></div>`:''}
     </div>`).addTo(map);
-  if (!qid) return;
+  if(!qid) return;
   fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&format=json&props=claims|labels|sitelinks&languages=en|ml&origin=*`)
-    .then(r=>r.json())
-    .then(data=>{
-      const entity = data.entities[qid];
-      if (!entity||!popup.isOpen()) return;
+    .then(r=>r.json()).then(data=>{
+      const entity=data.entities[qid]; if(!entity||!popup.isOpen()) return;
       const claims=entity.claims||{}, labels=entity.labels||{}, sl=entity.sitelinks||{};
-      const mlName = labels.ml?.value;
+      const mlName=labels.ml?.value;
       let pop=null;
-      if (claims.P1082?.length){
-        const pc=claims.P1082.sort((a,b)=>{
-          const aY=a.qualifiers?.P585?.[0]?.datavalue?.value?.time||'';
-          const bY=b.qualifiers?.P585?.[0]?.datavalue?.value?.time||'';
-          return bY.localeCompare(aY);
-        })[0];
-        const raw=pc?.mainsnak?.datavalue?.value?.amount;
-        if(raw) pop=parseInt(raw).toLocaleString('en-IN');
-      }
-      let area=null;
-      if(claims.P2046?.length){ const raw=claims.P2046[0]?.mainsnak?.datavalue?.value?.amount; if(raw) area=parseFloat(raw).toFixed(2)+' km²'; }
+      if(claims.P1082?.length){ const pc=claims.P1082.sort((a,b)=>{ const aY=a.qualifiers?.P585?.[0]?.datavalue?.value?.time||''; const bY=b.qualifiers?.P585?.[0]?.datavalue?.value?.time||''; return bY.localeCompare(aY); })[0]; const raw=pc?.mainsnak?.datavalue?.value?.amount; if(raw) pop=parseInt(raw).toLocaleString('en-IN'); }
+      let area=null; if(claims.P2046?.length){ const raw=claims.P2046[0]?.mainsnak?.datavalue?.value?.amount; if(raw) area=parseFloat(raw).toFixed(2)+' km²'; }
       const wiki=sl.enwiki?`https://en.wikipedia.org/wiki/${encodeURIComponent(sl.enwiki.title)}`:null;
-      const el=document.getElementById(`pu-wiki-${qid}`);
-      if(!el||!popup.isOpen()) return;
+      const el=document.getElementById(`pu-wiki-${qid}`); if(!el||!popup.isOpen()) return;
       let extra='';
       if(mlName) extra+=`<div><strong>മലയാളം:</strong> ${mlName}</div>`;
-      if(pop)    extra+=`<div><strong>Population:</strong> ${pop}</div>`;
-      if(area)   extra+=`<div><strong>Area:</strong> ${area}</div>`;
-      el.innerHTML = extra+(wiki?`<div style="margin-top:4px"><a href="${wiki}" target="_blank">📖 Wikipedia →</a></div>`:'');
+      if(pop) extra+=`<div><strong>Population:</strong> ${pop}</div>`;
+      if(area) extra+=`<div><strong>Area:</strong> ${area}</div>`;
+      el.innerHTML=extra+(wiki?`<div style="margin-top:4px"><a href="${wiki}" target="_blank">📖 Wikipedia →</a></div>`:'');
     }).catch(()=>{});
 }
 
-// ── Add layer ────────────────────────────────────────────────
-function addLayer(id, cfg, data){
-  if (map.getSource(id)) return;
+// ── Add layer ─────────────────────────────────────────────────
+function addLayer(id,cfg,data){
+  if(map.getSource(id)) return;
 
-  // Build gpDataMap when GP GeoJSON loads
-  if (id==='lsg_gp'){
-    data.features.forEach(f=>{
-      const key=(f.properties.LSGD||'').toLowerCase();
-      if(key) window.gpDataMap[key]=f.properties;
-    });
-    console.log('GP data map built:', Object.keys(window.gpDataMap).length,'entries');
+  if(id==='lsg_gp'){
+    // Build GP data map
+    data.features.forEach(f=>{ const k=(f.properties.LSGD||'').toLowerCase(); if(k) window.gpDataMap[k]=f.properties; });
+    // Precompute quantiles for all 3 metrics
+    Object.keys(METRICS).forEach(m=>{ window.gpQuantiles[m]=computeQuantiles(data.features,m); });
+    console.log('GP map + quantiles ready');
   }
 
   map.addSource(id,{type:'geojson',data});
-  map.addLayer({id:id+'-fill',type:'fill',source:id,
-    paint:{'fill-color':cfg.color,'fill-opacity':cfg.fo},
-    layout:{visibility:isOn(id)?'visible':'none'}});
-  map.addLayer({id:id+'-line',type:'line',source:id,
-    paint:{'line-color':cfg.color,'line-width':cfg.lw,'line-opacity':1},
-    layout:{visibility:isOn(id)?'visible':'none'}});
-  map.addLayer({id:id+'-hover',type:'fill',source:id,
-    paint:{'fill-color':cfg.color,'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.22,0]},
-    layout:{visibility:isOn(id)?'visible':'none'}});
+  map.addLayer({id:id+'-fill',type:'fill',source:id,paint:{'fill-color':cfg.color,'fill-opacity':cfg.fo},layout:{visibility:isOn(id)?'visible':'none'}});
+  map.addLayer({id:id+'-line',type:'line',source:id,paint:{'line-color':cfg.color,'line-width':cfg.lw,'line-opacity':1},layout:{visibility:isOn(id)?'visible':'none'}});
+  map.addLayer({id:id+'-hover',type:'fill',source:id,paint:{'fill-color':cfg.color,'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.22,0]},layout:{visibility:isOn(id)?'visible':'none'}});
   map.addLayer({id:id+'-label',type:'symbol',source:id,minzoom:cfg.lz,
-    layout:{'text-field':['get',cfg.nf],'text-size':cfg.ls,'text-font':[cfg.lb?'Open Sans Bold':'Open Sans Regular'],
-      'text-anchor':'center','text-max-width':7,'text-allow-overlap':false,
-      visibility:isOn(id)?'visible':'none'},
+    layout:{'text-field':['get',cfg.nf],'text-size':cfg.ls,'text-font':[cfg.lb?'Open Sans Bold':'Open Sans Regular'],'text-anchor':'center','text-max-width':7,'text-allow-overlap':false,visibility:isOn(id)?'visible':'none'},
     paint:{'text-color':cfg.color,'text-halo-color':'rgba(255,255,255,0.97)','text-halo-width':2.5}});
 
   map.on('click',id+'-fill',e=>{
     const p=e.features[0].properties;
     if(['lsg_gp','lsg_muni','lsg_corp'].includes(id)&&isOn('wards')&&map.getZoom()>=12) return;
-
-    if(id==='lsg_gp'){
-      const{html,qid}=buildGPPopup(p);
-      popup.setLngLat(e.lngLat).setHTML(html).addTo(map);
-      fetchWikiLink(qid);
-      return;
-    }
-    if(id==='lsg_muni'||id==='lsg_corp'){
-      buildMuniCorpPopup(cfg,p,e.lngLat);
-      return;
-    }
-    const name=p[cfg.nf]||'Unknown';
-    let det='';
-    cfg.df.forEach(([f,l])=>{ if(p[f]) det+=`<div><strong>${l}:</strong> ${cap(p[f])}</div>`; });
-    popup.setLngLat(e.lngLat).setHTML(`
-      <div class="pu-simple">
-        <div class="pu-layer">${cfg.label}</div>
-        <div class="pu-name">${cap(name)}</div>
-        ${det?`<div class="pu-details">${det}</div>`:''}
-      </div>`).addTo(map);
+    if(id==='lsg_gp'){ const{html,qid}=buildGPPopup(p); popup.setLngLat(e.lngLat).setHTML(html).addTo(map); fetchWikiLink(qid); return; }
+    if(id==='lsg_muni'||id==='lsg_corp'){ buildMuniCorpPopup(cfg,p,e.lngLat); return; }
+    const name=p[cfg.nf]||'Unknown'; let det=''; cfg.df.forEach(([f,l])=>{ if(p[f]) det+=`<div><strong>${l}:</strong> ${cap(p[f])}</div>`; });
+    popup.setLngLat(e.lngLat).setHTML(`<div class="pu-simple"><div class="pu-layer">${cfg.label}</div><div class="pu-name">${cap(name)}</div>${det?`<div class="pu-details">${det}</div>`:''}</div>`).addTo(map);
   });
-  map.on('mouseenter',id+'-fill',()=>{map.getCanvas().style.cursor='pointer';});
-  map.on('mouseleave',id+'-fill',()=>{map.getCanvas().style.cursor='';});
+  map.on('mouseenter',id+'-fill',()=>{ map.getCanvas().style.cursor='pointer'; });
+  map.on('mouseleave',id+'-fill',()=>{ map.getCanvas().style.cursor=''; });
 }
 
 map.on('load',()=>{
   Object.entries(LAYERS).forEach(([id,cfg])=>{
     loading(true);
-    fetch(cfg.url).then(r=>r.json()).then(d=>{addLayer(id,cfg,d);loading(false);})
-      .catch(e=>{console.warn('Failed:',id,e);loading(false);});
+    fetch(cfg.url).then(r=>r.json()).then(d=>{ addLayer(id,cfg,d); loading(false); }).catch(e=>{ console.warn('Failed:',id,e); loading(false); });
   });
 });
 
-// ── Wards ────────────────────────────────────────────────────
+// ── Wards ─────────────────────────────────────────────────────
 let wardLoaded=0, wardTotal=0;
-function updateWardProgress(){
-  const prog=document.getElementById('ward-progress');
-  if(!prog) return;
-  if(wardTotal===0){prog.textContent='';return;}
-  prog.textContent = wardLoaded>=wardTotal
-    ? '✓ All '+wardTotal+' districts loaded'
-    : 'Loading… '+wardLoaded+' / '+wardTotal+' districts';
-}
+function updateWardProgress(){ const p=document.getElementById('ward-progress'); if(!p) return; p.textContent=wardLoaded>=wardTotal?'✓ All '+wardTotal+' districts loaded':'Loading… '+wardLoaded+' / '+wardTotal+' districts'; }
 
 function loadVisibleWards(){
   if(!isOn('wards')||map.getZoom()<9) return;
   document.getElementById('ward-note').style.display='block';
-  const toLoad=DISTRICTS.filter(d=>!loadedWards.has(d));
-  if(!toLoad.length) return;
-  wardTotal=DISTRICTS.length; wardLoaded=DISTRICTS.length-toLoad.length;
-  updateWardProgress();
+  const toLoad=DISTRICTS.filter(d=>!loadedWards.has(d)); if(!toLoad.length) return;
+  wardTotal=DISTRICTS.length; wardLoaded=DISTRICTS.length-toLoad.length; updateWardProgress();
   toLoad.forEach(d=>{
-    loadedWards.add(d);
-    const sid='wards-'+d;
-    loading(true);
-    fetch(WARD_CDN+'/'+d+'_Wards.geojson')
-      .then(r=>r.json())
-      .then(data=>{
-        if(map.getSource(sid)){loading(false);wardLoaded++;updateWardProgress();return;}
-        map.addSource(sid,{type:'geojson',data});
-        const vis=isOn('wards')?'visible':'none', c='#0e6655';
-        map.addLayer({id:sid+'-fill',type:'fill',source:sid,paint:{'fill-color':c,'fill-opacity':0.06},layout:{visibility:vis}});
-        map.addLayer({id:sid+'-line',type:'line',source:sid,paint:{'line-color':c,'line-width':0.5,'line-opacity':1},layout:{visibility:vis}});
-        map.addLayer({id:sid+'-label',type:'symbol',source:sid,minzoom:13,
-          layout:{'text-field':['get','Ward_Name'],'text-size':9,'text-font':['Open Sans Regular'],
-            'text-anchor':'center','text-max-width':5,'text-allow-overlap':false,visibility:vis},
-          paint:{'text-color':c,'text-halo-color':'rgba(255,255,255,0.97)','text-halo-width':2}});
-
-        map.on('click',sid+'-fill',e=>{
-          const p       = e.features[0].properties;
-          const wardName= p.Ward_Name||'Unknown';
-          const lsgName = p.LSGD||'';
-          const lsgType = cap(p.Lsgd_Type||'');
-          const district= cap(p.District||'');
-          const wardNo  = p.Ward_No||'';
-
-          // Pull GP enriched data from gpDataMap
-          const gp    = window.gpDataMap[lsgName.toLowerCase()]||{};
-          const pop   = fmt(gp.population);
-          const area  = gp.area_sqkm ? parseFloat(gp.area_sqkm).toFixed(2)+' km²' : null;
-          const ml    = gp.lgd_name_malayalam||'';
-          const assem = cap(gp.assembly_constituency||'');
-          const parl  = cap(gp.parliament_constituency||'');
-          const pins  = gp.pincodes||'';
-
-          const stats=[];
-          if(pop)  stats.push(['Population',pop]);
-          if(area) stats.push(['Area',area]);
-          const statsHTML=stats.length
-            ? `<div class="pu-stats">${stats.map(([l,v])=>`<div class="pu-stat"><div class="pu-stat-label">${l}</div><div class="pu-stat-val">${v}</div></div>`).join('')}</div>`
-            : '';
-
-          const gpRows=[];
-          if(assem) gpRows.push(`<div><strong>Assembly:</strong> ${assem}</div>`);
-          if(parl)  gpRows.push(`<div><strong>Parliament:</strong> ${parl}</div>`);
-          if(pins)  gpRows.push(`<div><strong>Pincode${pins.includes(',')? 's':''}:</strong> ${pins}</div>`);
-
-          const qid=window.lsgWikidataMap[lsgName.toLowerCase()];
-
-          popup.setLngLat(e.lngLat).setHTML(`
-            <div class="pu-header">
-              <div class="pu-layer">Ward · ${lsgType}</div>
-              <div class="pu-name">${wardName}</div>
+    loadedWards.add(d); const sid='wards-'+d; loading(true);
+    fetch(WARD_CDN+'/'+d+'_Wards.geojson').then(r=>r.json()).then(data=>{
+      if(map.getSource(sid)){loading(false);wardLoaded++;updateWardProgress();return;}
+      map.addSource(sid,{type:'geojson',data});
+      const vis=isOn('wards')?'visible':'none', c='#0e6655';
+      map.addLayer({id:sid+'-fill',type:'fill',source:sid,paint:{'fill-color':c,'fill-opacity':0.06},layout:{visibility:vis}});
+      map.addLayer({id:sid+'-line',type:'line',source:sid,paint:{'line-color':c,'line-width':0.5},layout:{visibility:vis}});
+      map.addLayer({id:sid+'-label',type:'symbol',source:sid,minzoom:13,layout:{'text-field':['get','Ward_Name'],'text-size':9,'text-font':['Open Sans Regular'],'text-anchor':'center','text-max-width':5,'text-allow-overlap':false,visibility:vis},paint:{'text-color':c,'text-halo-color':'rgba(255,255,255,0.97)','text-halo-width':2}});
+      map.on('click',sid+'-fill',e=>{
+        const p=e.features[0].properties;
+        const wardName=p.Ward_Name||'Unknown', lsgName=p.LSGD||'', lsgType=cap(p.Lsgd_Type||''), district=cap(p.District||''), wardNo=p.Ward_No||'';
+        const gp=window.gpDataMap[lsgName.toLowerCase()]||{};
+        const pop=fmt(gp.population), area=gp.area_sqkm?parseFloat(gp.area_sqkm).toFixed(2)+' km²':null;
+        const ml=gp.lgd_name_malayalam||'', assem=cap(gp.assembly_constituency||''), parl=cap(gp.parliament_constituency||''), pins=gp.pincodes||'';
+        const stats=[]; if(pop) stats.push(['Population',pop]); if(area) stats.push(['Area',area]);
+        const statsHTML=stats.length?`<div class="pu-stats">${stats.map(([l,v])=>`<div class="pu-stat"><div class="pu-stat-label">${l}</div><div class="pu-stat-val">${v}</div></div>`).join('')}</div>`:'';
+        const gpRows=[]; if(assem) gpRows.push(`<div><strong>Assembly:</strong> ${assem}</div>`); if(parl) gpRows.push(`<div><strong>Parliament:</strong> ${parl}</div>`); if(pins) gpRows.push(`<div><strong>Pincode${pins.includes(',')? 's':''}:</strong> ${pins}</div>`);
+        const qid=window.lsgWikidataMap[lsgName.toLowerCase()];
+        popup.setLngLat(e.lngLat).setHTML(`
+          <div class="pu-header"><div class="pu-layer">Ward · ${lsgType}</div><div class="pu-name">${wardName}</div></div>
+          <div class="pu-body">
+            <div class="pu-rows" style="margin-bottom:8px"><div><strong>Ward No:</strong> ${wardNo}</div><div><strong>District:</strong> ${district}</div></div>
+            <div style="padding-top:7px;border-top:1px solid var(--border)">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:#aaa;margin-bottom:4px">Panchayat</div>
+              <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px">${cap(lsgName)}${ml?`<span style="font-weight:300;color:var(--muted);font-size:11px;margin-left:6px">${ml}</span>`:''}</div>
+              ${statsHTML}<div class="pu-rows">${gpRows.join('')}</div>
+              ${qid?`<div class="pu-wiki" id="pu-wiki-${qid}"><span style="color:#bbb;font-style:italic;font-size:10px">Loading Wikipedia…</span></div>`:''}
             </div>
-            <div class="pu-body">
-              <div class="pu-rows" style="margin-bottom:8px">
-                <div><strong>Ward No:</strong> ${wardNo}</div>
-                <div><strong>District:</strong> ${district}</div>
-              </div>
-              <div style="padding-top:7px;border-top:1px solid var(--border)">
-                <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:#aaa;margin-bottom:4px">Panchayat</div>
-                <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px">
-                  ${cap(lsgName)}${ml?`<span style="font-weight:300;color:var(--muted);font-size:11px;margin-left:6px">${ml}</span>`:''}
-                </div>
-                ${statsHTML}
-                <div class="pu-rows">${gpRows.join('')}</div>
-                ${qid?`<div class="pu-wiki" id="pu-wiki-${qid}"><span style="color:#bbb;font-style:italic;font-size:10px">Loading Wikipedia…</span></div>`:''}
-              </div>
-            </div>`).addTo(map);
-          fetchWikiLink(qid);
-        });
-        map.on('mouseenter',sid+'-fill',()=>{map.getCanvas().style.cursor='pointer';});
-        map.on('mouseleave',sid+'-fill',()=>{map.getCanvas().style.cursor='';});
-        wardLoaded++;updateWardProgress();loading(false);
-      })
-      .catch(e=>{
-        console.warn('Ward failed:',d,e);
-        loading(false);loadedWards.delete(d);wardLoaded++;updateWardProgress();
+          </div>`).addTo(map);
+        fetchWikiLink(qid);
       });
+      map.on('mouseenter',sid+'-fill',()=>{map.getCanvas().style.cursor='pointer';});
+      map.on('mouseleave',sid+'-fill',()=>{map.getCanvas().style.cursor='';});
+      wardLoaded++;updateWardProgress();loading(false);
+    }).catch(e=>{ console.warn('Ward failed:',d,e); loading(false); loadedWards.delete(d); wardLoaded++;updateWardProgress(); });
   });
 }
 
@@ -794,88 +755,48 @@ window.loadVisibleWards=loadVisibleWards;
 
 function isOn(id){ const el=document.querySelector('[data-layer="'+id+'"]'); return el&&el.classList.contains('on'); }
 
-// ── Search ───────────────────────────────────────────────────
+// ── Search ────────────────────────────────────────────────────
 let st;
-const si=document.getElementById('search-input');
-const sr=document.getElementById('search-results');
-
+const si=document.getElementById('search-input'), sr=document.getElementById('search-results');
 si.addEventListener('input',()=>{
-  clearTimeout(st);
-  const q=si.value.trim();
-  if(q.length<2){sr.style.display='none';return;}
+  clearTimeout(st); const q=si.value.trim(); if(q.length<2){sr.style.display='none';return;}
   st=setTimeout(()=>{
     const res=[];
-    Object.entries(LAYERS).forEach(([id,cfg])=>{
-      const src=map.getSource(id);
-      if(!src||!src._data) return;
-      (src._data.features||[]).forEach(f=>{
-        const n=f.properties[cfg.nf]||'';
-        if(n.toLowerCase().includes(q.toLowerCase())) res.push({name:n,layer:cfg.label,feature:f});
-      });
-    });
-    if(!res.length){
-      fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+' Kerala India')+'&format=json&limit=5')
-        .then(r=>r.json()).then(showNom);
-      return;
-    }
-    sr.innerHTML=res.slice(0,6).map((r,i)=>
-      `<div class="search-item" onclick="zoomToFeature(${i})"><strong>${cap(r.name)}</strong><span>${r.layer}</span></div>`
-    ).join('');
-    sr.style.display='block';
-    window._sr=res;
+    Object.entries(LAYERS).forEach(([id,cfg])=>{ const src=map.getSource(id); if(!src||!src._data) return; (src._data.features||[]).forEach(f=>{ const n=f.properties[cfg.nf]||''; if(n.toLowerCase().includes(q.toLowerCase())) res.push({name:n,layer:cfg.label,feature:f}); }); });
+    if(!res.length){ fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+' Kerala India')+'&format=json&limit=5').then(r=>r.json()).then(showNom); return; }
+    sr.innerHTML=res.slice(0,6).map((r,i)=>`<div class="search-item" onclick="zoomToFeature(${i})"><strong>${cap(r.name)}</strong><span>${r.layer}</span></div>`).join('');
+    sr.style.display='block'; window._sr=res;
   },280);
 });
-
-function showNom(data){
-  if(!data.length){sr.style.display='none';return;}
-  sr.innerHTML=data.map((r,i)=>
-    `<div class="search-item" onclick="zoomToNom(${r.lat},${r.lon})"><strong>${r.display_name.split(',')[0]}</strong><span>${r.display_name.split(',').slice(1,3).join(',')}</span></div>`
-  ).join('');
-  sr.style.display='block';
-}
-
+function showNom(data){ if(!data.length){sr.style.display='none';return;} sr.innerHTML=data.map((r,i)=>`<div class="search-item" onclick="zoomToNom(${r.lat},${r.lon})"><strong>${r.display_name.split(',')[0]}</strong><span>${r.display_name.split(',').slice(1,3).join(',')}</span></div>`).join(''); sr.style.display='block'; }
 document.addEventListener('click',e=>{ if(!e.target.closest('#search-wrap')) sr.style.display='none'; });
 </script>
 
 <script>
 function toggleLayer(el){
   el.classList.toggle('on');
-  const id=el.dataset.layer;
-  const vis=el.classList.contains('on')?'visible':'none';
+  const id=el.dataset.layer, vis=el.classList.contains('on')?'visible':'none';
   if(id==='wards'){
     const note=document.getElementById('ward-note');
     if(note) note.style.display=el.classList.contains('on')?'block':'none';
-    window.DISTRICTS.forEach(d=>{
-      ['fill','line','label'].forEach(t=>{
-        const lid='wards-'+d+'-'+t;
-        if(window._map&&window._map.getLayer(lid)) window._map.setLayoutProperty(lid,'visibility',vis);
-      });
-    });
+    window.DISTRICTS.forEach(d=>{ ['fill','line','label'].forEach(t=>{ const lid='wards-'+d+'-'+t; if(window._map&&window._map.getLayer(lid)) window._map.setLayoutProperty(lid,'visibility',vis); }); });
     if(vis==='visible') window.loadVisibleWards&&window.loadVisibleWards();
     return;
   }
-  ['fill','line','hover','label'].forEach(t=>{
-    const lid=id+'-'+t;
-    if(window._map&&window._map.getLayer(lid)) window._map.setLayoutProperty(lid,'visibility',vis);
-  });
+  ['fill','line','hover','label'].forEach(t=>{ const lid=id+'-'+t; if(window._map&&window._map.getLayer(lid)) window._map.setLayoutProperty(lid,'visibility',vis); });
 }
 
 function zoomToFeature(i){
-  const r=window._sr&&window._sr[i];
-  if(!r) return;
+  const r=window._sr&&window._sr[i]; if(!r) return;
   document.getElementById('search-results').style.display='none';
   document.getElementById('search-input').value=r.name;
-  const c=[];
-  (function ex(a){typeof a[0]==='number'?c.push(a):a.forEach(ex);})(r.feature.geometry.coordinates);
+  const c=[]; (function ex(a){typeof a[0]==='number'?c.push(a):a.forEach(ex);})(r.feature.geometry.coordinates);
   if(!c.length) return;
   const lngs=c.map(p=>p[0]),lats=c.map(p=>p[1]);
   window._map.fitBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]],{padding:80});
 }
 
-function zoomToNom(lat,lon){
-  document.getElementById('search-results').style.display='none';
-  window._map.flyTo({center:[lon,lat],zoom:12});
-}
+function zoomToNom(lat,lon){ document.getElementById('search-results').style.display='none'; window._map.flyTo({center:[lon,lat],zoom:12}); }
 </script>
 </body>
 </html>
