@@ -521,6 +521,82 @@ function addLayer(id, cfg, data) {
     const name = p[cfg.nf]||'Unknown';
     let det = '';
     cfg.df.forEach(([f,l]) => { if(p[f]) det+=`<div><strong>${l}:</strong> ${cap(p[f])}</div>`; });
+
+    // For LSG layer, enrich with Wikidata
+    if (id === 'lsg' && p.wikidata) {
+      const qid = p.wikidata;
+      const lsgType = cap(p['local_authority:IN'] || '');
+
+      // Show basic popup immediately
+      popup.setLngLat(e.lngLat).setHTML(`
+        <div class="pu-layer">LSG Body</div>
+        <div class="pu-name">${cap(name)}</div>
+        <div class="pu-details">
+          ${lsgType ? `<div><strong>Type:</strong> ${lsgType}</div>` : ''}
+          <div style="color:#aaa;font-style:italic;margin-top:4px">Loading details…</div>
+        </div>
+      `).addTo(map);
+
+      // Fetch Wikidata
+      fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&format=json&props=claims|labels|sitelinks&languages=en|ml&origin=*`)
+        .then(r => r.json())
+        .then(data => {
+          const entity = data.entities[qid];
+          if (!entity) return;
+
+          const claims = entity.claims || {};
+          const labels = entity.labels || {};
+          const sitelinks = entity.sitelinks || {};
+
+          // Malayalam name
+          const mlName = labels.ml ? labels.ml.value : null;
+
+          // Population (P1082)
+          let population = null;
+          if (claims.P1082 && claims.P1082.length) {
+            const popClaim = claims.P1082.sort((a,b) => {
+              const aYear = a.qualifiers?.P585?.[0]?.datavalue?.value?.time || '';
+              const bYear = b.qualifiers?.P585?.[0]?.datavalue?.value?.time || '';
+              return bYear.localeCompare(aYear);
+            })[0];
+            population = popClaim?.mainsnak?.datavalue?.value?.amount;
+            if (population) population = parseInt(population).toLocaleString('en-IN');
+          }
+
+          // Area (P2046)
+          let area = null;
+          if (claims.P2046 && claims.P2046.length) {
+            area = claims.P2046[0]?.mainsnak?.datavalue?.value?.amount;
+            if (area) area = parseFloat(area).toFixed(2) + ' km²';
+          }
+
+          // Wikipedia link
+          const wiki = sitelinks.enwiki ? `https://en.wikipedia.org/wiki/${encodeURIComponent(sitelinks.enwiki.title)}` : null;
+
+          // Build enriched popup
+          let enriched = '';
+          if (lsgType) enriched += `<div><strong>Type:</strong> ${lsgType}</div>`;
+          if (mlName) enriched += `<div><strong>മലയാളം:</strong> ${mlName}</div>`;
+          if (population) enriched += `<div><strong>Population:</strong> ${population}</div>`;
+          if (area) enriched += `<div><strong>Area:</strong> ${area}</div>`;
+          if (wiki) enriched += `<div style="margin-top:6px"><a href="${wiki}" target="_blank" style="color:#c0392b;text-decoration:none;font-size:11px">📖 Wikipedia →</a></div>`;
+          enriched += `<div style="margin-top:4px"><a href="https://www.wikidata.org/wiki/${qid}" target="_blank" style="color:#aaa;text-decoration:none;font-size:10px">${qid}</a></div>`;
+
+          // Update popup if still open
+          if (popup.isOpen()) {
+            popup.setHTML(`
+              <div class="pu-layer">LSG Body</div>
+              <div class="pu-name">${cap(name)}</div>
+              <div class="pu-details">${enriched}</div>
+            `);
+          }
+        })
+        .catch(() => {
+          // If Wikidata fails, just leave basic popup
+        });
+      return;
+    }
+
     popup.setLngLat(e.lngLat).setHTML(`
       <div class="pu-layer">${cfg.label}</div>
       <div class="pu-name">${cap(name)}</div>
