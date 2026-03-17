@@ -6,338 +6,304 @@
 <title>Kerala Open Maps</title>
 <link href="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.css" rel="stylesheet">
 <script src="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --white: #ffffff;
-    --off-white: #f8f7f4;
-    --border: #e8e4dc;
-    --text: #1a1a1a;
-    --text-muted: #6b6b6b;
-    --accent: #c84b31;
-    --panel-width: 280px;
+:root {
+  --white: #ffffff;
+  --bg: #f5f4f0;
+  --border: #ddd9d0;
+  --text: #1c1c1c;
+  --muted: #6e6e6e;
+  --accent: #c0392b;
+  --panel: 270px;
+}
 
-    --color-state: #1a1a2e;
-    --color-districts: #2d6a4f;
-    --color-subdistricts: #52b788;
-    --color-blocks: #e9c46a;
-    --color-parliament: #e63946;
-    --color-assembly: #457b9d;
-    --color-lsg: #9b5de5;
-    --color-villages: #f77f00;
-  }
+body {
+  font-family: 'Inter', sans-serif;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background: var(--bg);
+}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--off-white);
-    color: var(--text);
-    height: 100vh;
-    display: flex;
-    overflow: hidden;
-  }
+#sidebar {
+  width: var(--panel);
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  flex-shrink: 0;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.06);
+}
 
-  /* SIDEBAR */
+#sidebar-header {
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--border);
+  background: #1c1c1c;
+}
+
+#sidebar-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  color: #fff;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+}
+
+#sidebar-header p {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 3px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+#search-wrap {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+#search-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+#search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.08);
+}
+
+#search-input::placeholder { color: #aaa; }
+
+#search-results {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: calc(100% - 2px);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--white);
+  overflow: hidden;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.search-item {
+  padding: 9px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0ede6;
+  transition: background 0.1s;
+}
+.search-item:last-child { border-bottom: none; }
+.search-item:hover { background: var(--bg); }
+.search-item strong { display: block; font-size: 12px; font-weight: 500; }
+.search-item span { color: var(--muted); font-size: 11px; font-weight: 300; }
+
+#layers-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+}
+
+.group-title {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 12px 0 6px 2px;
+}
+
+.group-title:first-child { margin-top: 4px; }
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 1px;
+  transition: background 0.12s;
+  user-select: none;
+}
+
+.layer-row:hover { background: var(--bg); }
+
+.layer-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.layer-name {
+  font-size: 12px;
+  font-weight: 400;
+  flex: 1;
+  color: var(--text);
+}
+
+.layer-count {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+.toggle {
+  width: 30px;
+  height: 16px;
+  background: #d0cdc7;
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.18s;
+  flex-shrink: 0;
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.18s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+
+.layer-row.on .toggle { background: var(--accent); }
+.layer-row.on .toggle::after { transform: translateX(14px); }
+
+#sidebar-footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+#sidebar-footer a { color: var(--accent); text-decoration: none; }
+
+#map { flex: 1; height: 100vh; }
+
+#loading {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--muted);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: opacity 0.3s;
+}
+
+#loading.hidden { opacity: 0; pointer-events: none; }
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.maplibregl-popup-content {
+  font-family: 'Inter', sans-serif !important;
+  padding: 13px 15px !important;
+  border-radius: 7px !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13) !important;
+  max-width: 230px !important;
+  border: 1px solid var(--border) !important;
+}
+
+.pu-layer {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.pu-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 7px;
+  line-height: 1.2;
+}
+
+.pu-details {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.pu-details strong { color: var(--text); font-weight: 500; }
+
+#layers-wrap::-webkit-scrollbar { width: 3px; }
+#layers-wrap::-webkit-scrollbar-track { background: transparent; }
+#layers-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+#mob-btn {
+  display: none;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 7px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 600px) {
+  #mob-btn { display: block; }
   #sidebar {
-    width: var(--panel-width);
-    background: var(--white);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    z-index: 10;
-    flex-shrink: 0;
-  }
-
-  #sidebar-header {
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  #sidebar-header h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px;
-    line-height: 1.2;
-    color: var(--text);
-    letter-spacing: -0.3px;
-  }
-
-  #sidebar-header p {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 4px;
-    font-weight: 300;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-  }
-
-  /* SEARCH */
-  #search-wrap {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  #search-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    background: var(--off-white);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  #search-input:focus { border-color: var(--accent); }
-  #search-input::placeholder { color: var(--text-muted); }
-
-  #search-results {
-    margin-top: 6px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--white);
-    overflow: hidden;
-    display: none;
-  }
-
-  .search-result-item {
-    padding: 8px 12px;
-    font-size: 12px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
-  }
-
-  .search-result-item:last-child { border-bottom: none; }
-  .search-result-item:hover { background: var(--off-white); }
-  .search-result-item strong { display: block; font-size: 13px; }
-  .search-result-item span { color: var(--text-muted); font-size: 11px; }
-
-  /* LAYERS */
-  #layers-section {
-    flex: 1;
-    overflow-y: auto;
-    padding: 14px 16px;
-  }
-
-  #layers-section h2 {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
-
-  .layer-group {
-    margin-bottom: 16px;
-  }
-
-  .layer-group-title {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-muted);
-    font-weight: 500;
-    margin-bottom: 6px;
-    padding-left: 2px;
-  }
-
-  .layer-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.15s;
-    margin-bottom: 2px;
-    user-select: none;
-  }
-
-  .layer-item:hover { background: var(--off-white); }
-
-  .layer-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    flex-shrink: 0;
-    opacity: 0.85;
-  }
-
-  .layer-name {
-    font-size: 13px;
-    font-weight: 400;
-    flex: 1;
-  }
-
-  .layer-count {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 300;
-  }
-
-  .layer-toggle {
-    width: 32px;
-    height: 18px;
-    background: var(--border);
-    border-radius: 9px;
-    position: relative;
-    transition: background 0.2s;
-    flex-shrink: 0;
-  }
-
-  .layer-toggle::after {
-    content: '';
     position: absolute;
-    width: 14px;
-    height: 14px;
-    background: white;
-    border-radius: 50%;
-    top: 2px;
-    left: 2px;
-    transition: transform 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    left: -100%;
+    top: 0;
+    height: 100%;
+    transition: left 0.25s;
+    z-index: 15;
   }
-
-  .layer-item.active .layer-toggle {
-    background: var(--accent);
-  }
-
-  .layer-item.active .layer-toggle::after {
-    transform: translateX(14px);
-  }
-
-  /* FOOTER */
-  #sidebar-footer {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-    font-size: 10px;
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
-
-  #sidebar-footer a {
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  /* MAP */
-  #map {
-    flex: 1;
-    height: 100vh;
-  }
-
-  /* POPUP */
-  .maplibregl-popup-content {
-    font-family: 'DM Sans', sans-serif !important;
-    padding: 14px 16px !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
-    max-width: 240px !important;
-    border: 1px solid var(--border) !important;
-  }
-
-  .popup-layer {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-muted);
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-  .popup-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 16px;
-    color: var(--text);
-    margin-bottom: 8px;
-    line-height: 1.2;
-  }
-
-  .popup-details {
-    font-size: 12px;
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
-
-  .popup-details strong {
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  /* INFO PANEL */
-  #info-panel {
-    position: absolute;
-    bottom: 30px;
-    right: 20px;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 11px;
-    color: var(--text-muted);
-    z-index: 5;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  #info-panel.visible { opacity: 1; }
-
-  /* LOADING */
-  .layer-loading {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border: 1px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    margin-left: 4px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* SCROLLBAR */
-  #layers-section::-webkit-scrollbar { width: 4px; }
-  #layers-section::-webkit-scrollbar-track { background: transparent; }
-  #layers-section::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* MOBILE */
-  #mobile-toggle {
-    display: none;
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 20;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 10px;
-    cursor: pointer;
-    font-size: 18px;
-  }
-
-  @media (max-width: 640px) {
-    #mobile-toggle { display: block; }
-    #sidebar {
-      position: absolute;
-      left: -100%;
-      top: 0;
-      height: 100%;
-      transition: left 0.3s;
-      z-index: 15;
-    }
-    #sidebar.open { left: 0; }
-  }
+  #sidebar.open { left: 0; }
+}
 </style>
 </head>
 <body>
 
-<button id="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+<button id="mob-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
 <div id="sidebar">
   <div id="sidebar-header">
@@ -346,519 +312,369 @@
   </div>
 
   <div id="search-wrap">
-    <input type="text" id="search-input" placeholder="Search a place in Kerala…">
+    <input type="text" id="search-input" placeholder="Search districts, villages, constituencies…">
     <div id="search-results"></div>
   </div>
 
-  <div id="layers-section">
-    <h2>Layers</h2>
+  <div id="layers-wrap">
 
-    <div class="layer-group">
-      <div class="layer-group-title">Administrative</div>
-      <div class="layer-item active" data-layer="state" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:var(--color-state)"></div>
-        <span class="layer-name">State</span>
-        <span class="layer-count">1</span>
-        <div class="layer-toggle"></div>
-      </div>
-      <div class="layer-item active" data-layer="districts" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:var(--color-districts)"></div>
-        <span class="layer-name">Districts</span>
-        <span class="layer-count">14</span>
-        <div class="layer-toggle"></div>
-      </div>
-      <div class="layer-item" data-layer="subdistricts" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:var(--color-subdistricts)"></div>
-        <span class="layer-name">Sub-Districts</span>
-        <span class="layer-count">76</span>
-        <div class="layer-toggle"></div>
-      </div>
-      <div class="layer-item" data-layer="blocks" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:var(--color-blocks)"></div>
-        <span class="layer-name">Blocks</span>
-        <span class="layer-count">152</span>
-        <div class="layer-toggle"></div>
-      </div>
-      <div class="layer-item" data-layer="villages" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:var(--color-villages)"></div>
-        <span class="layer-name">Villages</span>
-        <span class="layer-count">1,623</span>
-        <div class="layer-toggle"></div>
-      </div>
+    <div class="group-title">Administrative</div>
+
+    <div class="layer-row on" data-layer="state" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#c0392b"></div>
+      <span class="layer-name">State</span>
+      <span class="layer-count">1</span>
+      <div class="toggle"></div>
     </div>
 
-    <div class="layer-group">
-      <div class="layer-group-title">Electoral</div>
-      <div class="layer-item" data-layer="parliament" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:var(--color-parliament)"></div>
-        <span class="layer-name">Parliamentary</span>
-        <span class="layer-count">20</span>
-        <div class="layer-toggle"></div>
-      </div>
-      <div class="layer-item" data-layer="assembly" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:var(--color-assembly)"></div>
-        <span class="layer-name">Assembly</span>
-        <span class="layer-count">141</span>
-        <div class="layer-toggle"></div>
-      </div>
+    <div class="layer-row on" data-layer="districts" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#1a5276"></div>
+      <span class="layer-name">Districts</span>
+      <span class="layer-count">14</span>
+      <div class="toggle"></div>
     </div>
 
-    <div class="layer-group">
-      <div class="layer-group-title">Local Governance</div>
-      <div class="layer-item" data-layer="lsg" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:var(--color-lsg)"></div>
-        <span class="layer-name">LSG Bodies</span>
-        <span class="layer-count">1,035</span>
-        <div class="layer-toggle"></div>
-      </div>
-      <div class="layer-item" data-layer="wards" onclick="toggleLayer(this)">
-        <div class="layer-dot" style="background:#06d6a0"></div>
-        <span class="layer-name">Wards</span>
-        <span class="layer-count">~21,000</span>
-        <div class="layer-toggle"></div>
-      </div>
+    <div class="layer-row" data-layer="subdistricts" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#148f77"></div>
+      <span class="layer-name">Sub-Districts</span>
+      <span class="layer-count">76</span>
+      <div class="toggle"></div>
     </div>
+
+    <div class="layer-row" data-layer="blocks" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#b7770d"></div>
+      <span class="layer-name">Blocks</span>
+      <span class="layer-count">152</span>
+      <div class="toggle"></div>
+    </div>
+
+    <div class="layer-row" data-layer="villages" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#784212"></div>
+      <span class="layer-name">Villages</span>
+      <span class="layer-count">1,623</span>
+      <div class="toggle"></div>
+    </div>
+
+    <div class="group-title">Electoral</div>
+
+    <div class="layer-row" data-layer="parliament" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#922b21"></div>
+      <span class="layer-name">Parliamentary</span>
+      <span class="layer-count">20</span>
+      <div class="toggle"></div>
+    </div>
+
+    <div class="layer-row" data-layer="assembly" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#1f618d"></div>
+      <span class="layer-name">Assembly</span>
+      <span class="layer-count">141</span>
+      <div class="toggle"></div>
+    </div>
+
+    <div class="group-title">Local Governance</div>
+
+    <div class="layer-row" data-layer="lsg" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#6c3483"></div>
+      <span class="layer-name">LSG Bodies</span>
+      <span class="layer-count">1,035</span>
+      <div class="toggle"></div>
+    </div>
+
+    <div class="layer-row" data-layer="wards" onclick="toggleLayer(this)">
+      <div class="layer-swatch" style="background:#0e6655"></div>
+      <span class="layer-name">Wards</span>
+      <span class="layer-count">~21,000</span>
+      <div class="toggle"></div>
+    </div>
+
   </div>
 
   <div id="sidebar-footer">
-    Data from LGD, ECI, OSM Kerala &amp; Delimitation Commission.<br>
+    Sources: LGD · ECI · OSM Kerala · Delimitation Commission<br>
     <a href="https://github.com/medonthomas-alt/Kerala_Open_Maps" target="_blank">GitHub</a> · ODbL License
   </div>
 </div>
 
 <div id="map"></div>
-<div id="info-panel">Click any boundary to see details</div>
+<div id="loading"><div class="spinner"></div> Loading…</div>
 
 <script>
-window.addEventListener('load', function() {
-const BASE = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data';
+const CDN = 'https://cdn.jsdelivr.net/gh/medonthomas-alt/Kerala_Open_Maps@main/data';
+const WARD_CDN = CDN + '/local-governance/wards';
 
 const LAYERS = {
   state: {
-    url: `${BASE}/administrative/state/Kerala_LGD_States.geojson`,
-    color: '#1a1a2e',
-    nameField: 'STNAME',
-    detailFields: [],
-    label: 'State',
-    labelMinZoom: 6, labelSize: 14
+    url: CDN+'/administrative/state/Kerala_LGD_States.geojson',
+    color:'#c0392b', lw:3, fo:0.07,
+    nf:'STNAME', df:[], label:'State',
+    lz:6, ls:16, lb:true
   },
   districts: {
-    url: `${BASE}/administrative/districts/Kerala_LGD_Districts.geojson`,
-    color: '#2d6a4f',
-    nameField: 'dtname',
-    detailFields: [['stname', 'State']],
-    label: 'District',
-    labelMinZoom: 7, labelSize: 12
+    url: CDN+'/administrative/districts/Kerala_LGD_Districts.geojson',
+    color:'#1a5276', lw:2, fo:0.07,
+    nf:'dtname', df:[['stname','State']], label:'District',
+    lz:7, ls:13, lb:true
   },
   subdistricts: {
-    url: `${BASE}/administrative/subdistricts/Kerala_LGD_Subdistricts.geojson`,
-    color: '#52b788',
-    nameField: 'sdtname',
-    detailFields: [['dtname', 'District'], ['stname', 'State']],
-    label: 'Sub-District',
-    labelMinZoom: 9, labelSize: 11
+    url: CDN+'/administrative/subdistricts/Kerala_LGD_Subdistricts.geojson',
+    color:'#148f77', lw:1.2, fo:0.07,
+    nf:'sdtname', df:[['dtname','District']], label:'Sub-District',
+    lz:9, ls:11, lb:false
   },
   blocks: {
-    url: `${BASE}/administrative/blocks/Kerala_LGD_Blocks.geojson`,
-    color: '#e9c46a',
-    nameField: 'block_name',
-    detailFields: [['district', 'District'], ['state', 'State']],
-    label: 'Block',
-    labelMinZoom: 9, labelSize: 11
+    url: CDN+'/administrative/blocks/Kerala_LGD_Blocks.geojson',
+    color:'#b7770d', lw:1, fo:0.07,
+    nf:'block_name', df:[['district','District']], label:'Block',
+    lz:9, ls:11, lb:false
   },
   villages: {
-    url: `${BASE}/administrative/villages/Kerala_LGD_Villages.geojson`,
-    color: '#f77f00',
-    nameField: 'vilname11',
-    detailFields: [['sdtname', 'Sub-District'], ['dtname', 'District']],
-    label: 'Village',
-    labelMinZoom: 12, labelSize: 10
+    url: CDN+'/administrative/villages/Kerala_LGD_Villages.geojson',
+    color:'#784212', lw:0.6, fo:0.06,
+    nf:'vilname11', df:[['sdtname','Sub-District'],['dtname','District']], label:'Village',
+    lz:12, ls:10, lb:false
   },
   parliament: {
-    url: `${BASE}/electoral/parliamentary/Kerala_LGD_Parliament_Constituencies.geojson`,
-    color: '#e63946',
-    nameField: 'pc_name',
-    detailFields: [['st_name', 'State']],
-    label: 'Parliamentary Constituency',
-    labelMinZoom: 7, labelSize: 12
+    url: CDN+'/electoral/parliamentary/Kerala_LGD_Parliament_Constituencies.geojson',
+    color:'#922b21', lw:2.5, fo:0.07,
+    nf:'pc_name', df:[['st_name','State']], label:'Parliamentary Constituency',
+    lz:7, ls:12, lb:true
   },
   assembly: {
-    url: `${BASE}/electoral/assembly/Kerala_LGD_Assembly_Constituencies.geojson`,
-    color: '#457b9d',
-    nameField: 'ac_name',
-    detailFields: [['dist_name', 'District'], ['pc_name', 'Parliament']],
-    label: 'Assembly Constituency',
-    labelMinZoom: 9, labelSize: 11
+    url: CDN+'/electoral/assembly/Kerala_LGD_Assembly_Constituencies.geojson',
+    color:'#1f618d', lw:1.5, fo:0.07,
+    nf:'ac_name', df:[['dist_name','District'],['pc_name','Parliament']], label:'Assembly Constituency',
+    lz:9, ls:11, lb:false
   },
   lsg: {
-    url: `${BASE}/local-governance/lsg/kerala_lsg_data.geojson`,
-    color: '#9b5de5',
-    nameField: 'name',
-    detailFields: [['local_authority:IN', 'Type']],
-    label: 'LSG Body',
-    labelMinZoom: 10, labelSize: 10
-  },
-  wards: {
-    url: null, // loaded dynamically by district
-    color: '#06d6a0',
-    nameField: 'Ward_Name',
-    detailFields: [['LSGD', 'LSG Body'], ['District', 'District'], ['Lsgd_Type', 'Type']],
-    label: 'Ward',
-    labelMinZoom: 13, labelSize: 9
+    url: CDN+'/local-governance/lsg/kerala_lsg_data.geojson',
+    color:'#6c3483', lw:0.8, fo:0.07,
+    nf:'name', df:[['local_authority:IN','Type']], label:'LSG Body',
+    lz:10, ls:10, lb:false
   }
 };
 
-// Init map
+const DISTRICTS = ['Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod',
+  'Kollam','Kottayam','Kozhikode','Malappuram','Palakkad',
+  'Pathanamthitta','Thiruvanathapuram','Thrissur','Wayanad'];
+
+window.DISTRICTS = DISTRICTS;
+const loadedWards = new Set();
+let lc = 0;
+
+function loading(on) {
+  lc = Math.max(0, lc + (on ? 1 : -1));
+  document.getElementById('loading').classList.toggle('hidden', lc === 0);
+}
+
 const map = new maplibregl.Map({
   container: 'map',
   style: {
     version: 8,
     glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
-    sources: {
-      'osm': {
-        type: 'raster',
-        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-        tileSize: 256,
-        attribution: '© OpenStreetMap contributors'
-      }
-    },
-    layers: [{
-      id: 'osm-tiles',
-      type: 'raster',
-      source: 'osm',
-      paint: { 'raster-opacity': 0.15 }
-    }]
+    sources: { osm: { type:'raster', tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize:256, attribution:'© OpenStreetMap' } },
+    layers: [{ id:'osm', type:'raster', source:'osm', paint:{'raster-opacity':0.2,'raster-saturation':-0.4} }]
   },
   center: [76.5, 10.5],
   zoom: 7,
-  maxBounds: [[73, 7.5], [80, 13.5]]
+  maxBounds: [[73,7],[81,14]]
 });
+
 window._map = map;
-
 map.addControl(new maplibregl.NavigationControl(), 'top-right');
-map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+map.addControl(new maplibregl.ScaleControl({unit:'metric'}), 'bottom-left');
 
-const popup = new maplibregl.Popup({ closeButton: true, closeOnClick: false, maxWidth: '260px' });
+const popup = new maplibregl.Popup({ closeButton:true, closeOnClick:false, maxWidth:'260px' });
 
-const WARD_BASE = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/local-governance/wards';
+function addLayer(id, cfg, data) {
+  if (map.getSource(id)) return;
+  map.addSource(id, { type:'geojson', data });
 
-window.DISTRICTS = [
-  'Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod',
-  'Kollam','Kottayam','Kozhikode','Malappuram','Palakkad',
-  'Pathanamthitta','Thiruvanathapuram','Thrissur','Wayanad'
-];
+  map.addLayer({ id:id+'-fill', type:'fill', source:id,
+    paint:{'fill-color':cfg.color,'fill-opacity':cfg.fo},
+    layout:{visibility: isOn(id)?'visible':'none'} });
 
-const DISTRICTS = window.DISTRICTS;
+  map.addLayer({ id:id+'-line', type:'line', source:id,
+    paint:{'line-color':cfg.color,'line-width':cfg.lw,'line-opacity':1},
+    layout:{visibility: isOn(id)?'visible':'none'} });
 
-const loadedWardDistricts = new Set();
+  map.addLayer({ id:id+'-hover', type:'fill', source:id,
+    paint:{'fill-color':cfg.color,'fill-opacity':['case',['boolean',['feature-state','hover'],false],0.22,0]},
+    layout:{visibility: isOn(id)?'visible':'none'} });
 
-// Load wards for visible districts based on zoom/bounds
+  map.addLayer({ id:id+'-label', type:'symbol', source:id, minzoom:cfg.lz,
+    layout:{
+      'text-field':['get',cfg.nf],
+      'text-size':cfg.ls,
+      'text-font':[cfg.lb?'Open Sans Bold':'Open Sans Regular'],
+      'text-anchor':'center','text-max-width':7,'text-allow-overlap':false,
+      visibility: isOn(id)?'visible':'none'
+    },
+    paint:{'text-color':cfg.color,'text-halo-color':'rgba(255,255,255,0.97)','text-halo-width':2.5}
+  });
+
+  map.on('click', id+'-fill', e => {
+    const p = e.features[0].properties;
+    const name = p[cfg.nf]||'Unknown';
+    let det = '';
+    cfg.df.forEach(([f,l]) => { if(p[f]) det+=`<div><strong>${l}:</strong> ${cap(p[f])}</div>`; });
+    popup.setLngLat(e.lngLat).setHTML(`
+      <div class="pu-layer">${cfg.label}</div>
+      <div class="pu-name">${cap(name)}</div>
+      ${det?`<div class="pu-details">${det}</div>`:''}
+    `).addTo(map);
+  });
+  map.on('mouseenter', id+'-fill', ()=>{ map.getCanvas().style.cursor='pointer'; });
+  map.on('mouseleave', id+'-fill', ()=>{ map.getCanvas().style.cursor=''; });
+}
+
+map.on('load', () => {
+  loading(false);
+  Object.entries(LAYERS).forEach(([id,cfg]) => {
+    loading(true);
+    fetch(cfg.url).then(r=>r.json()).then(d=>{ addLayer(id,cfg,d); loading(false); })
+      .catch(e=>{ console.warn('Failed:',id,e); loading(false); });
+  });
+});
+
 function loadVisibleWards() {
-  if (!isActive('wards')) return;
-  const zoom = map.getZoom();
-  if (zoom < 10) return;
-
-  const bounds = map.getBounds();
-  DISTRICTS.forEach(district => {
-    if (loadedWardDistricts.has(district)) return;
-    const sourceId = `wards-${district}`;
-    if (map.getSource(sourceId)) return;
-
-    const url = `${WARD_BASE}/${district}_Wards.geojson`;
-    loadedWardDistricts.add(district);
-
-    fetch(url)
-      .then(r => r.json())
+  if (!isOn('wards')) return;
+  if (map.getZoom() < 9) return;
+  DISTRICTS.forEach(d => {
+    if (loadedWards.has(d)) return;
+    loadedWards.add(d);
+    const sid = 'wards-'+d;
+    loading(true);
+    fetch(WARD_CDN+'/'+d+'_Wards.geojson')
+      .then(r=>r.json())
       .then(data => {
-        map.addSource(sourceId, { type: 'geojson', data });
-        map.addLayer({
-          id: `${sourceId}-fill`,
-          type: 'fill',
-          source: sourceId,
-          paint: { 'fill-color': '#06d6a0', 'fill-opacity': 0.08 },
-          layout: { visibility: isActive('wards') ? 'visible' : 'none' }
+        if (map.getSource(sid)) { loading(false); return; }
+        map.addSource(sid, { type:'geojson', data });
+        const vis = isOn('wards')?'visible':'none';
+        const c = '#0e6655';
+        map.addLayer({id:sid+'-fill',type:'fill',source:sid,paint:{'fill-color':c,'fill-opacity':0.06},layout:{visibility:vis}});
+        map.addLayer({id:sid+'-line',type:'line',source:sid,paint:{'line-color':c,'line-width':0.5,'line-opacity':1},layout:{visibility:vis}});
+        map.addLayer({id:sid+'-label',type:'symbol',source:sid,minzoom:13,
+          layout:{'text-field':['get','Ward_Name'],'text-size':9,'text-font':['Open Sans Regular'],'text-anchor':'center','text-max-width':5,'text-allow-overlap':false,visibility:vis},
+          paint:{'text-color':c,'text-halo-color':'rgba(255,255,255,0.97)','text-halo-width':2}
         });
-        map.addLayer({
-          id: `${sourceId}-line`,
-          type: 'line',
-          source: sourceId,
-          paint: { 'line-color': '#06d6a0', 'line-width': 0.5, 'line-opacity': 0.8 },
-          layout: { visibility: isActive('wards') ? 'visible' : 'none' }
+        map.on('click',sid+'-fill',e=>{
+          const p=e.features[0].properties;
+          popup.setLngLat(e.lngLat).setHTML(`
+            <div class="pu-layer">Ward</div>
+            <div class="pu-name">${p.Ward_Name||'Unknown'}</div>
+            <div class="pu-details">
+              <div><strong>LSG Body:</strong> ${p.LSGD||''}</div>
+              <div><strong>Type:</strong> ${p.Lsgd_Type||''}</div>
+              <div><strong>District:</strong> ${p.District||''}</div>
+              <div><strong>Ward No:</strong> ${p.Ward_No||''}</div>
+            </div>
+          `).addTo(map);
         });
-        map.addLayer({
-          id: `${sourceId}-label`,
-          type: 'symbol',
-          source: sourceId,
-          minzoom: 13,
-          layout: {
-            'text-field': ['get', 'Ward_Name'],
-            'text-size': 9,
-            'text-font': ['Open Sans Regular'],
-            'text-anchor': 'center',
-            'text-max-width': 6,
-            'text-allow-overlap': false,
-            visibility: isActive('wards') ? 'visible' : 'none'
-          },
-          paint: {
-            'text-color': '#06d6a0',
-            'text-halo-color': 'rgba(255,255,255,0.9)',
-            'text-halo-width': 2
-          }
-        });
-        map.on('click', `${sourceId}-fill`, (e) => {
-          const props = e.features[0].properties;
-          popup.setLngLat(e.lngLat)
-            .setHTML(`
-              <div class="popup-layer">Ward</div>
-              <div class="popup-name">${props.Ward_Name || 'Unknown'}</div>
-              <div class="popup-details">
-                <div><strong>LSG Body:</strong> ${props.LSGD || ''}</div>
-                <div><strong>Type:</strong> ${props.Lsgd_Type || ''}</div>
-                <div><strong>District:</strong> ${props.District || ''}</div>
-                <div><strong>Ward No:</strong> ${props.Ward_No || ''}</div>
-              </div>
-            `)
-            .addTo(map);
-        });
-        map.on('mouseenter', `${sourceId}-fill`, () => { map.getCanvas().style.cursor = 'pointer'; });
-        map.on('mouseleave', `${sourceId}-fill`, () => { map.getCanvas().style.cursor = ''; });
+        map.on('mouseenter',sid+'-fill',()=>{map.getCanvas().style.cursor='pointer';});
+        map.on('mouseleave',sid+'-fill',()=>{map.getCanvas().style.cursor='';});
+        loading(false);
       })
-      .catch(err => console.warn(`Failed to load wards for ${district}:`, err));
+      .catch(e=>{ console.warn('Ward failed:',d,e); loading(false); loadedWards.delete(d); });
   });
 }
 
-map.on('moveend', loadVisibleWards);
 map.on('zoomend', loadVisibleWards);
+map.on('moveend', loadVisibleWards);
 window.loadVisibleWards = loadVisibleWards;
 
-// Load all layers
-map.on('load', () => {
-  Object.entries(LAYERS).forEach(([id, cfg]) => {
-    if (id === 'wards') return; // handled separately
-    const url = cfg.url;
-    fetch(url)
-      .then(r => r.json())
-      .then(data => {
-        map.addSource(id, { type: 'geojson', data });
-
-        // Fill
-        map.addLayer({
-          id: `${id}-fill`,
-          type: 'fill',
-          source: id,
-          paint: {
-            'fill-color': cfg.color,
-            'fill-opacity': 0.08
-          },
-          layout: { visibility: isActive(id) ? 'visible' : 'none' }
-        });
-
-        // Line
-        map.addLayer({
-          id: `${id}-line`,
-          type: 'line',
-          source: id,
-          paint: {
-            'line-color': cfg.color,
-            'line-width': getLineWidth(id),
-            'line-opacity': 0.8
-          },
-          layout: { visibility: isActive(id) ? 'visible' : 'none' }
-        });
-
-        // Hover fill
-        map.addLayer({
-          id: `${id}-hover`,
-          type: 'fill',
-          source: id,
-          paint: {
-            'fill-color': cfg.color,
-            'fill-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.2, 0]
-          },
-          layout: { visibility: isActive(id) ? 'visible' : 'none' }
-        });
-
-        // Label
-        map.addLayer({
-          id: `${id}-label`,
-          type: 'symbol',
-          source: id,
-          minzoom: cfg.labelMinZoom,
-          layout: {
-            'text-field': ['get', cfg.nameField],
-            'text-size': cfg.labelSize,
-            'text-font': ['Open Sans Regular'],
-            'text-anchor': 'center',
-            'text-max-width': 8,
-            'text-allow-overlap': false,
-            'text-ignore-placement': false,
-            visibility: isActive(id) ? 'visible' : 'none'
-          },
-          paint: {
-            'text-color': cfg.color,
-            'text-halo-color': 'rgba(255,255,255,0.9)',
-            'text-halo-width': 2
-          }
-        });
-
-        // Click handler
-        map.on('click', `${id}-fill`, (e) => {
-          const props = e.features[0].properties;
-          const name = props[cfg.nameField] || 'Unknown';
-
-          let detailsHtml = '';
-          cfg.detailFields.forEach(([field, label]) => {
-            if (props[field]) {
-              detailsHtml += `<div><strong>${label}:</strong> ${capitalize(props[field])}</div>`;
-            }
-          });
-
-          popup.setLngLat(e.lngLat)
-            .setHTML(`
-              <div class="popup-layer">${cfg.label}</div>
-              <div class="popup-name">${capitalize(name)}</div>
-              ${detailsHtml ? `<div class="popup-details">${detailsHtml}</div>` : ''}
-            `)
-            .addTo(map);
-        });
-
-        // Hover cursor
-        map.on('mouseenter', `${id}-fill`, () => { map.getCanvas().style.cursor = 'pointer'; });
-        map.on('mouseleave', `${id}-fill`, () => { map.getCanvas().style.cursor = ''; });
-      })
-      .catch(err => console.warn(`Failed to load ${id}:`, err));
-  });
-});
-
-function isActive(id) {
-  const el = document.querySelector(`[data-layer="${id}"]`);
-  return el && el.classList.contains('active');
+function isOn(id) {
+  const el = document.querySelector('[data-layer="'+id+'"]');
+  return el && el.classList.contains('on');
 }
 
-function getLineWidth(id) {
-  const widths = { state: 2.5, districts: 1.8, subdistricts: 1.2, blocks: 1, villages: 0.6, parliament: 2, assembly: 1.5, lsg: 1 };
-  return widths[id] || 1;
-}
-
-function capitalize(str) {
-  if (!str) return '';
-  return str.toString().replace(/\b\w/g, c => c.toUpperCase()).toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+function cap(s) {
+  if (!s) return '';
+  return s.toString().toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
 }
 
 // Search
-let searchTimeout;
-const searchInput = document.getElementById('search-input');
-const searchResults = document.getElementById('search-results');
+let st;
+const si = document.getElementById('search-input');
+const sr = document.getElementById('search-results');
 
-searchInput.addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  const q = searchInput.value.trim();
-  if (q.length < 3) { searchResults.style.display = 'none'; return; }
-
-  searchTimeout = setTimeout(() => {
-    // Search loaded GeoJSON data
-    const results = [];
-    Object.entries(LAYERS).forEach(([id, cfg]) => {
-      const source = map.getSource(id);
-      if (!source || !source._data) return;
-      const features = source._data.features || [];
-      features.forEach(f => {
-        const name = f.properties[cfg.nameField] || '';
-        if (name.toLowerCase().includes(q.toLowerCase())) {
-          results.push({ name, layer: cfg.label, feature: f, id });
-        }
+si.addEventListener('input', () => {
+  clearTimeout(st);
+  const q = si.value.trim();
+  if (q.length < 2) { sr.style.display='none'; return; }
+  st = setTimeout(() => {
+    const res = [];
+    Object.entries(LAYERS).forEach(([id,cfg]) => {
+      const src = map.getSource(id);
+      if (!src||!src._data) return;
+      (src._data.features||[]).forEach(f => {
+        const n = f.properties[cfg.nf]||'';
+        if (n.toLowerCase().includes(q.toLowerCase())) res.push({name:n,layer:cfg.label,feature:f});
       });
     });
-
-    if (results.length === 0) {
-      // Fallback to Nominatim
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ' Kerala India')}&format=json&limit=5`)
-        .then(r => r.json())
-        .then(data => showNominatimResults(data));
+    if (!res.length) {
+      fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+' Kerala India')+'&format=json&limit=5')
+        .then(r=>r.json()).then(showNom);
       return;
     }
-
-    // Show local results
-    searchResults.innerHTML = results.slice(0, 6).map((r, i) =>
-      `<div class="search-result-item" onclick="zoomToFeature(${i})">
-        <strong>${capitalize(r.name)}</strong>
-        <span>${r.layer}</span>
-      </div>`
+    sr.innerHTML = res.slice(0,6).map((r,i)=>
+      `<div class="search-item" onclick="zoomToFeature(${i})"><strong>${cap(r.name)}</strong><span>${r.layer}</span></div>`
     ).join('');
-    searchResults.style.display = 'block';
-    window._searchResults = results;
-  }, 300);
+    sr.style.display = 'block';
+    window._sr = res;
+  }, 280);
 });
 
-function showNominatimResults(data) {
-  if (!data.length) { searchResults.style.display = 'none'; return; }
-  searchResults.innerHTML = data.map((r, i) =>
-    `<div class="search-result-item" onclick="zoomToNominatim(${r.lat}, ${r.lon})">
-      <strong>${r.display_name.split(',')[0]}</strong>
-      <span>${r.display_name.split(',').slice(1, 3).join(',')}</span>
-    </div>`
+function showNom(data) {
+  if (!data.length) { sr.style.display='none'; return; }
+  sr.innerHTML = data.map((r,i)=>
+    `<div class="search-item" onclick="zoomToNom(${r.lat},${r.lon})"><strong>${r.display_name.split(',')[0]}</strong><span>${r.display_name.split(',').slice(1,3).join(',')}</span></div>`
   ).join('');
-  searchResults.style.display = 'block';
+  sr.style.display = 'block';
 }
 
-// Hide search on outside click
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('#search-wrap')) searchResults.style.display = 'none';
+document.addEventListener('click', e => {
+  if (!e.target.closest('#search-wrap')) sr.style.display='none';
 });
-}); // end window.onload
+</script>
 
-// Global functions for onclick attributes
+<script>
 function toggleLayer(el) {
-  el.classList.toggle('active');
+  el.classList.toggle('on');
   const id = el.dataset.layer;
-  const vis = el.classList.contains('active') ? 'visible' : 'none';
-
+  const vis = el.classList.contains('on') ? 'visible' : 'none';
   if (id === 'wards') {
-    // Toggle all ward district layers
-    DISTRICTS.forEach(district => {
-      [`wards-${district}-fill`, `wards-${district}-line`, `wards-${district}-label`].forEach(layerId => {
-        if (window._map && window._map.getLayer(layerId)) {
-          window._map.setLayoutProperty(layerId, 'visibility', vis);
-        }
+    window.DISTRICTS.forEach(d => {
+      ['fill','line','label'].forEach(t => {
+        const lid = 'wards-'+d+'-'+t;
+        if (window._map && window._map.getLayer(lid))
+          window._map.setLayoutProperty(lid, 'visibility', vis);
       });
     });
-    // Also trigger loading if turning on
-    if (vis === 'visible') loadVisibleWards();
+    if (vis === 'visible') window.loadVisibleWards && window.loadVisibleWards();
     return;
   }
-
-  [`${id}-fill`, `${id}-line`, `${id}-hover`, `${id}-label`].forEach(layerId => {
-    if (window._map && window._map.getLayer(layerId)) {
-      window._map.setLayoutProperty(layerId, 'visibility', vis);
-    }
+  ['fill','line','hover','label'].forEach(t => {
+    const lid = id+'-'+t;
+    if (window._map && window._map.getLayer(lid))
+      window._map.setLayoutProperty(lid, 'visibility', vis);
   });
 }
 
 function zoomToFeature(i) {
-  const result = window._searchResults && window._searchResults[i];
-  if (!result) return;
+  const r = window._sr && window._sr[i];
+  if (!r) return;
   document.getElementById('search-results').style.display = 'none';
-  document.getElementById('search-input').value = result.name;
-  const coords = getAllCoords(result.feature.geometry);
-  if (!coords.length) return;
-  const lngs = coords.map(c => c[0]);
-  const lats = coords.map(c => c[1]);
-  window._map.fitBounds([[Math.min(...lngs), Math.min(...lats)],[Math.max(...lngs), Math.max(...lats)]], { padding: 80 });
+  document.getElementById('search-input').value = r.name;
+  const c = [];
+  (function ex(a){ typeof a[0]==='number'?c.push(a):a.forEach(ex); })(r.feature.geometry.coordinates);
+  if (!c.length) return;
+  const lngs=c.map(p=>p[0]), lats=c.map(p=>p[1]);
+  window._map.fitBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]],{padding:80});
 }
 
-function zoomToNominatim(lat, lon) {
+function zoomToNom(lat, lon) {
   document.getElementById('search-results').style.display = 'none';
-  window._map.flyTo({ center: [lon, lat], zoom: 12 });
-}
-
-function getAllCoords(geometry) {
-  const coords = [];
-  function extract(c) {
-    if (typeof c[0] === 'number') coords.push(c);
-    else c.forEach(extract);
-  }
-  extract(geometry.coordinates);
-  return coords;
+  window._map.flyTo({ center:[lon,lat], zoom:12 });
 }
 </script>
 </body>
