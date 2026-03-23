@@ -413,15 +413,15 @@ map.on('load', async () => {
   try {
     const acRes = await fetch(AC_URL);
     const acData = await acRes.json();
-    // Filter Kozhikode
+    console.log('Total AC features:', acData.features.length);
+    console.log('Sample props:', acData.features[0].properties);
+
+    // Filter Kozhikode — try every possible field/value combination
     const kozhi = { ...acData, features: acData.features.filter(f => {
       const p = f.properties;
-      return (
-        p.dist_name === 'KOZHIKODE' ||
-        p.District  === 'KOZHIKODE' ||
-        p.dt_name   === 'KOZHIKODE' ||
-        (Number(p.ac_no) >= 20 && Number(p.ac_no) <= 32)
-      );
+      const acNo = Number(p.ac_no || p.AC_NO || p.acno || 0);
+      const dist  = String(p.dist_name || p.District || p.DISTRICT || p.dt_name || '').toUpperCase();
+      return dist.includes('KOZHIKODE') || (acNo >= 20 && acNo <= 32);
     })};
     console.log('Kozhikode ACs found:', kozhi.features.length);
 
@@ -443,8 +443,8 @@ map.on('load', async () => {
       type: 'symbol',
       source: 'ac',
       layout: {
-        'text-field': ['get', 'ac_name'],
-        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+        'text-field': ['coalesce', ['get', 'ac_name'], ['get', 'AC_NAME'], ['get', 'name']],
+        'text-font': ['Noto Sans Bold'],
         'text-size': 11,
         'text-anchor': 'center',
         'text-max-width': 8,
