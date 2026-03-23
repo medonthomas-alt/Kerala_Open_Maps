@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kozhikode — Assembly Election 2021</title>
+<link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --text: #e8eaf0;
+    --text-muted: #8892b0;
+    --accent: #e53935;
+    --accent2: #1e88e5;
+    --gold: #f4c842;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    z-index: 10;
+    flex-shrink: 0;
+  }
+  .header-left h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.01em;
+  }
+  .header-left p {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .header-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* ── Toggle buttons ── */
+  .toggle-group {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .toggle-btn {
+    padding: 6px 14px;
+    font-size: 0.72rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-btn.active {
+    background: var(--accent2);
+    color: #fff;
+  }
+  .toggle-btn:hover:not(.active) {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  /* ── Map container ── */
+  #map {
+    flex: 1;
+    width: 100%;
+  }
+
+  /* ── Side panel ── */
+  #panel {
+    position: absolute;
+    top: 70px;
+    left: 16px;
+    width: 260px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    z-index: 5;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  #panel h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  /* Legend */
+  .legend-scale {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+  .legend-bar {
+    height: 10px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #fff7ec, #fee8c8, #fdd49e, #fdbb84, #fc8d59, #ef6548, #d7301f, #990000);
+    margin-bottom: 4px;
+  }
+  .legend-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+  }
+
+  /* Stats */
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.72rem;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--text-muted); }
+  .stat-value { font-weight: 600; color: var(--text); }
+
+  /* ── Tooltip / Popup ── */
+  .maplibregl-popup-content {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 12px 14px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+    min-width: 180px;
+    font-family: 'Inter', sans-serif;
+  }
+  .maplibregl-popup-tip { display: none !important; }
+  .popup-lsgd {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .popup-type {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .popup-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .popup-row:last-child { border-bottom: none; }
+  .popup-key { color: var(--text-muted); }
+  .popup-val { font-weight: 600; color: var(--text); }
+
+  /* ── AC label style override ── */
+  .ac-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  /* ── Source note ── */
+  .source-note {
+    position: absolute;
+    bottom: 30px;
+    right: 16px;
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    background: rgba(15,17,23,0.8);
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Kozhikode District — Assembly Election 2021</h1>
+    <p>Booth-wise votes aggregated by local body · Kerala Open Maps</p>
+  </div>
+  <div class="header-right">
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="btn-total" onclick="setMode('total')">Total Votes</button>
+      <button class="toggle-btn" id="btn-per-booth" onclick="setMode('per_booth')">Per Booth</button>
+    </div>
+  </div>
+</header>
+
+<div id="map"></div>
+
+<div id="panel">
+  <h3>Legend</h3>
+  <div class="legend-scale">
+    <div class="legend-bar" id="legend-bar"></div>
+    <div class="legend-labels">
+      <span id="legend-min">Low</span>
+      <span id="legend-max">High</span>
+    </div>
+  </div>
+  <div id="stats">
+    <div class="stat-row">
+      <span class="stat-label">Total LSGDs</span>
+      <span class="stat-value" id="stat-lsgds">78</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Gram Panchayats</span>
+      <span class="stat-value">70</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Municipalities</span>
+      <span class="stat-value">7</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Corporations</span>
+      <span class="stat-value">1</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Total Booths</span>
+      <span class="stat-value" id="stat-booths">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Total Votes</span>
+      <span class="stat-value" id="stat-votes">—</span>
+    </div>
+  </div>
+</div>
+
+<div class="source-note">Source: CEO Kerala FORM 20 PDFs · Susewind 2014 booth points · Kerala Open Maps</div>
+
+<script>
+const GEOJSON_URL = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/electoral/Kozhikode_LSGD_Votes_2021.geojson';
+const AC_URL      = 'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/electoral/assembly/Kerala_LGD_Assembly_Constituencies_Enriched.geojson';
+
+// Colour ramp — matches YlOrRd
+const COLOR_RAMP = ['#fff7ec','#fee8c8','#fdd49e','#fdbb84','#fc8d59','#ef6548','#d7301f','#990000'];
+
+let mode = 'total';
+let geojsonData = null;
+
+const map = new maplibregl.Map({
+  container: 'map',
+  style: {
+    version: 8,
+    sources: {
+      osm: {
+        type: 'raster',
+        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        tileSize: 256,
+        attribution: '© OpenStreetMap contributors'
+      }
+    },
+    layers: [{ id: 'osm', type: 'raster', source: 'osm', paint: { 'raster-opacity': 0.15 } }],
+    glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf'
+  },
+  center: [75.85, 11.45],
+  zoom: 9,
+  minZoom: 7,
+  maxZoom: 14
+});
+
+map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+
+const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 });
+
+function getStops(field, data) {
+  const vals = data.features
+    .map(f => f.properties[field])
+    .filter(v => v > 0);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const step = (max - min) / (COLOR_RAMP.length - 1);
+  return COLOR_RAMP.map((c, i) => [min + i * step, c]).flat();
+}
+
+function buildFillColor(field, data) {
+  const stops = getStops(field, data);
+  return [
+    'interpolate', ['linear'],
+    ['get', field],
+    ...stops
+  ];
+}
+
+function updateLegend(field, data) {
+  const vals = data.features.map(f => f.properties[field]).filter(v => v > 0);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  document.getElementById('legend-min').textContent =
+    field === 'total_votes' ? min.toLocaleString() : min.toFixed(0);
+  document.getElementById('legend-max').textContent =
+    field === 'total_votes' ? max.toLocaleString() : max.toFixed(0);
+}
+
+function updateStats(data) {
+  const totalVotes = data.features.reduce((s, f) => s + (f.properties.total_votes || 0), 0);
+  const totalBooths = data.features.reduce((s, f) => s + (f.properties.num_booths || 0), 0);
+  document.getElementById('stat-votes').textContent = totalVotes.toLocaleString();
+  document.getElementById('stat-booths').textContent = totalBooths.toLocaleString();
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-total').classList.toggle('active', m === 'total');
+  document.getElementById('btn-per-booth').classList.toggle('active', m === 'per_booth');
+
+  const field = m === 'total' ? 'total_votes' : 'votes_per_booth';
+  if (map.getLayer('lsgd-fill') && geojsonData) {
+    map.setPaintProperty('lsgd-fill', 'fill-color', [
+      'case',
+      ['==', ['get', field], 0], '#2a2d3e',
+      buildFillColor(field, geojsonData)
+    ]);
+    updateLegend(field, geojsonData);
+  }
+}
+
+map.on('load', async () => {
+  // Load LSGD votes GeoJSON
+  const res = await fetch(GEOJSON_URL);
+  geojsonData = await res.json();
+
+  map.addSource('lsgd', { type: 'geojson', data: geojsonData });
+
+  // Fill layer
+  map.addLayer({
+    id: 'lsgd-fill',
+    type: 'fill',
+    source: 'lsgd',
+    paint: {
+      'fill-color': [
+        'case',
+        ['==', ['get', 'total_votes'], 0], '#2a2d3e',
+        buildFillColor('total_votes', geojsonData)
+      ],
+      'fill-opacity': 0.85
+    }
+  });
+
+  // Border layer
+  map.addLayer({
+    id: 'lsgd-border',
+    type: 'line',
+    source: 'lsgd',
+    paint: {
+      'line-color': '#0f1117',
+      'line-width': 0.6,
+      'line-opacity': 0.8
+    }
+  });
+
+  // Hover highlight
+  map.addLayer({
+    id: 'lsgd-hover',
+    type: 'line',
+    source: 'lsgd',
+    paint: {
+      'line-color': '#ffffff',
+      'line-width': 2,
+      'line-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0]
+    }
+  });
+
+  updateLegend('total_votes', geojsonData);
+  updateStats(geojsonData);
+
+  // Load AC boundaries
+  try {
+    const acRes = await fetch(AC_URL);
+    const acData = await acRes.json();
+    // Filter Kozhikode
+    const kozhi = { ...acData, features: acData.features.filter(f => {
+      const p = f.properties;
+      return (
+        p.dist_name === 'KOZHIKODE' ||
+        p.District  === 'KOZHIKODE' ||
+        p.dt_name   === 'KOZHIKODE' ||
+        (Number(p.ac_no) >= 20 && Number(p.ac_no) <= 32)
+      );
+    })};
+    console.log('Kozhikode ACs found:', kozhi.features.length);
+
+    map.addSource('ac', { type: 'geojson', data: kozhi });
+
+    map.addLayer({
+      id: 'ac-border',
+      type: 'line',
+      source: 'ac',
+      paint: {
+        'line-color': '#ffffff',
+        'line-width': 2,
+        'line-opacity': 0.9
+      }
+    });
+
+    map.addLayer({
+      id: 'ac-labels',
+      type: 'symbol',
+      source: 'ac',
+      layout: {
+        'text-field': ['get', 'ac_name'],
+        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+        'text-size': 11,
+        'text-anchor': 'center',
+        'text-max-width': 8,
+        'text-letter-spacing': 0.05,
+        'text-transform': 'uppercase',
+      },
+      paint: {
+        'text-color': '#ffffff',
+        'text-halo-color': '#000000',
+        'text-halo-width': 1.5,
+      }
+    });
+  } catch(e) {
+    console.warn('AC boundaries not loaded:', e);
+  }
+
+  // Hover interactions
+  let hoveredId = null;
+
+  map.on('mousemove', 'lsgd-fill', (e) => {
+    map.getCanvas().style.cursor = 'pointer';
+    if (e.features.length > 0) {
+      if (hoveredId !== null) {
+        map.setFeatureState({ source: 'lsgd', id: hoveredId }, { hover: false });
+      }
+      hoveredId = e.features[0].id;
+      map.setFeatureState({ source: 'lsgd', id: hoveredId }, { hover: true });
+
+      const p = e.features[0].properties;
+      const field = mode === 'total' ? 'total_votes' : 'votes_per_booth';
+      const val = p[field];
+
+      popup.setLngLat(e.lngLat).setHTML(`
+        <div class="popup-lsgd">${p.LSGD}</div>
+        <div class="popup-type">${p.lsgd_type}</div>
+        <div class="popup-row">
+          <span class="popup-key">Total Votes</span>
+          <span class="popup-val">${Number(p.total_votes).toLocaleString()}</span>
+        </div>
+        <div class="popup-row">
+          <span class="popup-key">Booths</span>
+          <span class="popup-val">${p.num_booths}</span>
+        </div>
+        <div class="popup-row">
+          <span class="popup-key">Avg per Booth</span>
+          <span class="popup-val">${Number(p.votes_per_booth).toFixed(0)}</span>
+        </div>
+      `).addTo(map);
+    }
+  });
+
+  map.on('mouseleave', 'lsgd-fill', () => {
+    map.getCanvas().style.cursor = '';
+    if (hoveredId !== null) {
+      map.setFeatureState({ source: 'lsgd', id: hoveredId }, { hover: false });
+    }
+    hoveredId = null;
+    popup.remove();
+  });
+});
+</script>
+</body>
+</html>
