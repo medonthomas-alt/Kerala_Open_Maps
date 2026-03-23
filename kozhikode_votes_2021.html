@@ -365,7 +365,8 @@ map.on('load', async () => {
   const res = await fetch(GEOJSON_URL);
   geojsonData = await res.json();
 
-  map.addSource('lsgd', { type: 'geojson', data: geojsonData });
+  geojsonData.features = geojsonData.features.map((f,i) => ({...f, id:i}));
+  map.addSource('lsgd', { type: 'geojson', data: geojsonData, generateId: true });
 
   // Fill layer
   map.addLayer({
@@ -409,18 +410,28 @@ map.on('load', async () => {
   updateLegend('total_votes', geojsonData);
   updateStats(geojsonData);
 
-  // Load AC boundaries
+  // Load AC boundaries — try enriched first, fall back to plain
   try {
-    const acRes = await fetch(AC_URL);
-    const acData = await acRes.json();
-    console.log('Total AC features:', acData.features.length);
-    console.log('Sample props:', acData.features[0].properties);
+    const urls = [
+      'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/electoral/assembly/Kerala_LGD_Assembly_Constituencies_Enriched.geojson',
+      'https://raw.githubusercontent.com/medonthomas-alt/Kerala_Open_Maps/main/data/electoral/assembly/Kerala_LGD_Assembly_Constituencies.geojson'
+    ];
+    let acData = null;
+    for (const url of urls) {
+      try {
+        const r = await fetch(url);
+        if (r.ok) { acData = await r.json(); console.log('AC loaded from:', url); break; }
+      } catch(e) { console.warn('Failed:', url); }
+    }
+    if (!acData) throw new Error('All AC URLs failed');
 
-    // Filter Kozhikode — try every possible field/value combination
+    console.log('Total AC features:', acData.features.length);
+    console.log('Sample props:', JSON.stringify(acData.features[0].properties).slice(0,200));
+
     const kozhi = { ...acData, features: acData.features.filter(f => {
       const p = f.properties;
-      const acNo = Number(p.ac_no || p.AC_NO || p.acno || 0);
-      const dist  = String(p.dist_name || p.District || p.DISTRICT || p.dt_name || '').toUpperCase();
+      const acNo = Number(p.ac_no || p.AC_NO || p.acno || p.OBJECTID || 0);
+      const dist = String(p.dist_name || p.District || p.DISTRICT || p.dt_name || '').toUpperCase();
       return dist.includes('KOZHIKODE') || (acNo >= 20 && acNo <= 32);
     })};
     console.log('Kozhikode ACs found:', kozhi.features.length);
