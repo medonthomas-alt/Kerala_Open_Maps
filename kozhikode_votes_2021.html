@@ -438,16 +438,40 @@ map.on('load', async () => {
 
     map.addSource('ac', { type: 'geojson', data: kozhi });
 
+    // AC fill — transparent, just to make sure layer exists above LSGD
+    map.addLayer({
+      id: 'ac-fill',
+      type: 'fill',
+      source: 'ac',
+      paint: { 'fill-color': 'transparent', 'fill-opacity': 0 }
+    });
+
     map.addLayer({
       id: 'ac-border',
       type: 'line',
       source: 'ac',
       paint: {
         'line-color': '#ffffff',
-        'line-width': 2,
-        'line-opacity': 0.9
+        'line-width': 2.5,
+        'line-opacity': 1
       }
     });
+
+    // AC border glow for visibility
+    map.addLayer({
+      id: 'ac-border-glow',
+      type: 'line',
+      source: 'ac',
+      paint: {
+        'line-color': '#000000',
+        'line-width': 5,
+        'line-opacity': 0.4,
+        'line-blur': 3
+      }
+    });
+    // Move glow below white border
+    map.moveLayer('ac-border-glow');
+    map.moveLayer('ac-border');
 
     map.addLayer({
       id: 'ac-labels',
